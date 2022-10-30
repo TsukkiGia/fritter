@@ -1,4 +1,5 @@
 import type {Request, Response, NextFunction} from 'express';
+import {Types} from 'mongoose';
 import UserCollection from '../user/collection';
 
 /**
@@ -13,7 +14,9 @@ const isCurrentSessionUserExists = async (req: Request, res: Response, next: Nex
     if (!user) {
       req.session.userId = undefined;
       res.status(500).json({
-        error: 'User session was not recognized.'
+        error: {
+          userNotFound: 'User session was not recognized.'
+        }
       });
       return;
     }
@@ -26,10 +29,28 @@ const isCurrentSessionUserExists = async (req: Request, res: Response, next: Nex
  * Checks if a username in req.body is valid, that is, it matches the username regex
  */
 const isValidUsername = (req: Request, res: Response, next: NextFunction) => {
-  const usernameRegex = /^\w+$/i;
-  if (!usernameRegex.test(req.body.username)) {
+  if (req.body.username ?? (req.query.username as string)) {
+    const usernameRegex = /^\w+$/i;
+    if (!usernameRegex.test(req.body.username ?? (req.query.username as string))) {
+      res.status(400).json({
+        error: {
+          username: 'Username must be a nonempty alphanumeric string.'
+        }
+      });
+      return;
+    }
+  }
+
+  next();
+};
+
+const isValidDisplayName = (req: Request, res: Response, next: NextFunction) => {
+  const displaynameRegex = /^(\w+(\s?))+$/i;
+  if (!displaynameRegex.test(req.body.displayName)) {
     res.status(400).json({
-      error: 'Username must be a nonempty alphanumeric string.'
+      error: {
+        displayName: 'Display Name must be a nonempty alphanumeric string.'
+      }
     });
     return;
   }
@@ -41,12 +62,50 @@ const isValidUsername = (req: Request, res: Response, next: NextFunction) => {
  * Checks if a password in req.body is valid, that is, at 6-50 characters long without any spaces
  */
 const isValidPassword = (req: Request, res: Response, next: NextFunction) => {
-  const passwordRegex = /^\S+$/;
-  if (!passwordRegex.test(req.body.password)) {
-    res.status(400).json({
-      error: 'Password must be a nonempty string.'
-    });
-    return;
+  if (req.body.password) {
+    const passwordRegex = /^\S+$/;
+    if (!passwordRegex.test(req.body.password)) {
+      res.status(400).json({
+        error: {
+          password: 'Password must be a nonempty string.'
+        }
+      });
+      return;
+    }
+  }
+
+  next();
+};
+
+const isValidPrivacySetting = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.isPrivate) {
+    if (req.body.isPrivate !== 'true' && req.body.isPrivate !== 'false') {
+      res.status(400).json({
+        error: {
+          password: 'isPrivate must be true or false.'
+        }
+      });
+      return;
+    }
+
+    const user = await UserCollection.findOneByUserId(req.session.userId);
+    if (user.isPrivate && req.body.isPrivate === 'true') {
+      res.status(400).json({
+        error: {
+          isPrivate: 'Current user is already private.'
+        }
+      });
+      return;
+    }
+
+    if (!user.isPrivate && req.body.isPrivate === 'false') {
+      res.status(400).json({
+        error: {
+          isPrivate: 'Current user is already public.'
+        }
+      });
+      return;
+    }
   }
 
   next();
@@ -78,17 +137,21 @@ const isAccountExists = async (req: Request, res: Response, next: NextFunction) 
  * Checks if a username in req.body is already in use
  */
 const isUsernameNotAlreadyInUse = async (req: Request, res: Response, next: NextFunction) => {
-  if (req.body.username !== undefined) { // If username is not being changed, skip this check
+  if (req.body.username) {
     const user = await UserCollection.findOneByUsername(req.body.username);
 
     // If the current session user wants to change their username to one which matches
     // the current one irrespective of the case, we should allow them to do so
-    if (user && (user?._id.toString() !== req.session.userId)) {
-      res.status(409).json({
-        error: 'An account with this username already exists.'
-      });
+    if (!user || (user?._id.toString() === req.session.userId)) {
+      next();
       return;
     }
+
+    res.status(409).json({
+      error: {
+        username: 'An account with this username already exists.'
+      }
+    });
   }
 
   next();
@@ -100,7 +163,9 @@ const isUsernameNotAlreadyInUse = async (req: Request, res: Response, next: Next
 const isUserLoggedIn = (req: Request, res: Response, next: NextFunction) => {
   if (!req.session.userId) {
     res.status(403).json({
-      error: 'You must be logged in to complete this action.'
+      error: {
+        auth: 'You must be logged in to complete this action.'
+      }
     });
     return;
   }
@@ -144,6 +209,26 @@ const isAuthorExists = async (req: Request, res: Response, next: NextFunction) =
   next();
 };
 
+const doesUserExist = async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.params.userId) {
+    res.status(400).json({
+      error: 'Provided user id must be nonempty.'
+    });
+    return;
+  }
+
+  const validFormat = Types.ObjectId.isValid(req.params.userId);
+  const user = validFormat ? await UserCollection.findOneByUserId(req.params.userId) : '';
+  if (!user) {
+    res.status(404).json({
+      error: `A user with id ${req.params.userId} does not exist.`
+    });
+    return;
+  }
+
+  next();
+};
+
 export {
   isCurrentSessionUserExists,
   isUserLoggedIn,
@@ -152,5 +237,8 @@ export {
   isAccountExists,
   isAuthorExists,
   isValidUsername,
-  isValidPassword
+  isValidPassword,
+  doesUserExist,
+  isValidPrivacySetting,
+  isValidDisplayName
 };

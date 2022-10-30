@@ -10,6 +10,9 @@ import {Schema, model} from 'mongoose';
 export type User = {
   _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
   username: string;
+  displayName: string;
+  profilePictureColor: string;
+  isPrivate: boolean;
   password: string;
   dateJoined: Date;
 };
@@ -31,6 +34,18 @@ const UserSchema = new Schema({
   // The date the user joined
   dateJoined: {
     type: Date,
+    required: true
+  },
+  displayName: {
+    type: String,
+    required: true
+  },
+  profilePictureColor: {
+    type: String,
+    required: true
+  },
+  isPrivate: {
+    type: Boolean,
     required: true
   }
 });

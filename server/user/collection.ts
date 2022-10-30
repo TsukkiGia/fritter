@@ -18,10 +18,11 @@ class UserCollection {
    * @param {string} password - The password of the user
    * @return {Promise<HydratedDocument<User>>} - The newly created user
    */
-  static async addOne(username: string, password: string): Promise<HydratedDocument<User>> {
+  static async addOne(username: string, password: string, displayName: string): Promise<HydratedDocument<User>> {
     const dateJoined = new Date();
-
-    const user = new UserModel({username, password, dateJoined});
+    const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink'];
+    const profilePictureColor = colors[Math.floor(Math.random() * colors.length)];
+    const user = new UserModel({username, password, dateJoined, displayName, profilePictureColor, isPrivate: false});
     await user.save(); // Saves user to MongoDB
     return user;
   }
@@ -46,6 +47,11 @@ class UserCollection {
     return UserModel.findOne({username: new RegExp(`^${username.trim()}$`, 'i')});
   }
 
+  static async findManyByUsername(username: string): Promise<Array<HydratedDocument<User>>> {
+    const regex = new RegExp(username, 'i');
+    return UserModel.find({username: {$regex: regex}});
+  }
+
   /**
    * Find a user by username (case insensitive).
    *
@@ -67,14 +73,18 @@ class UserCollection {
    * @param {Object} userDetails - An object with the user's updated credentials
    * @return {Promise<HydratedDocument<User>>} - The updated user
    */
-  static async updateOne(userId: Types.ObjectId | string, userDetails: {password?: string; username?: string}): Promise<HydratedDocument<User>> {
+  static async updateOne(userId: Types.ObjectId | string, userDetails: any): Promise<HydratedDocument<User>> {
     const user = await UserModel.findOne({_id: userId});
     if (userDetails.password) {
-      user.password = userDetails.password;
+      user.password = userDetails.password as string;
     }
 
     if (userDetails.username) {
-      user.username = userDetails.username;
+      user.username = userDetails.username as string;
+    }
+
+    if (userDetails.isPrivate) {
+      user.isPrivate = userDetails.isPrivate === 'true';
     }
 
     await user.save();

@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import type {Request, Response, NextFunction} from 'express';
 import {Types} from 'mongoose';
 import FreetCollection from '../freet/collection';
+import moment from 'moment';
 
 /**
  * Checks if a freet with freetId is req.params exists
@@ -10,7 +12,62 @@ const isFreetExists = async (req: Request, res: Response, next: NextFunction) =>
   const freet = validFormat ? await FreetCollection.findOne(req.params.freetId) : '';
   if (!freet) {
     res.status(404).json({
-      error: `Freet with freet ID ${req.params.freetId} does not exist.`
+      error: {
+        freetNotFound: `Freet with freet ID ${req.params.freetId} does not exist.`
+      }
+    });
+    return;
+  }
+
+  next();
+};
+
+/**
+ * Checks if a freet with freetId is req.params exists
+ */
+const doesFreetExistGeneral = async (req: Request, res: Response, next: NextFunction) => {
+  const freetId = (req.query.freetId ?? req.body.freetId) as string;
+  if (!freetId) {
+    res.status(400).json({
+      error: {
+        freetNotSpecified: 'FreetId must not be empty'
+      }
+    });
+    return;
+  }
+
+  const validFormat = Types.ObjectId.isValid(freetId);
+  const freet = validFormat ? await FreetCollection.findOne(freetId) : '';
+  if (!freet) {
+    res.status(404).json({
+      error: {
+        freetNotFound: `Freet with freet ID ${freetId} does not exist.`
+      }
+    });
+    return;
+  }
+
+  next();
+};
+
+const doesFreetExistGeneralDelete = async (req: Request, res: Response, next: NextFunction) => {
+  const {freetId} = req.params;
+  if (!freetId) {
+    res.status(400).json({
+      error: {
+        freetNotSpecified: 'FreetId must not be empty'
+      }
+    });
+    return;
+  }
+
+  const validFormat = Types.ObjectId.isValid(freetId);
+  const freet = validFormat ? await FreetCollection.findOneExisted(freetId) : '';
+  if (!freet) {
+    res.status(404).json({
+      error: {
+        freetNotFound: `Freet with freet ID ${freetId} does not exist.`
+      }
     });
     return;
   }
@@ -45,7 +102,7 @@ const isValidFreetContent = (req: Request, res: Response, next: NextFunction) =>
  * Checks if the current user is the author of the freet whose freetId is in req.params
  */
 const isValidFreetModifier = async (req: Request, res: Response, next: NextFunction) => {
-  const freet = await FreetCollection.findOne(req.params.freetId);
+  const freet = await FreetCollection.findOneExisted(req.params.freetId);
   const userId = freet.authorId._id;
   if (req.session.userId !== userId.toString()) {
     res.status(403).json({
@@ -57,8 +114,73 @@ const isValidFreetModifier = async (req: Request, res: Response, next: NextFunct
   next();
 };
 
+const isValidDate = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.deadlineYear === '' || req.body.deadlineMonth === '' || req.body.deadlineDay === '') {
+    res.status(400).json({
+      error: 'Missing a date parameter.'
+    });
+    return;
+  }
+
+  const day = (req.body.deadlineDay as string).length === 1 ? '0' + (req.body.deadlineDay as string) : req.body.deadlineDay as string;
+  const month = (req.body.deadlineMonth as string).length === 1 ? '0' + (req.body.deadlineMonth as string) : req.body.deadlineMonth as string;
+  const year = req.body.deadlineYear as string;
+  const dateString = month + '/' + day + '/' + year;
+  const isValid = moment(dateString, 'MM/DD/YYYY', true).isValid();
+  if (!isValid) {
+    res.status(400).json({
+      error: 'Invalid date.'
+    });
+    return;
+  }
+
+  next();
+};
+
+const isValidComment = async (req: Request, res: Response, next: NextFunction) => {
+  const commentPropagation = req.body.commentPropagation as string;
+  if (commentPropagation !== 'true' && commentPropagation !== 'false') {
+    res.status(400).json({
+      error: 'Invalid comment propagation. Must be true or false'
+    });
+    return;
+  }
+
+  next();
+};
+
+const isValidToDelete = async (req: Request, res: Response, next: NextFunction) => {
+  const toDelete = req.body.toDelete as string;
+  if (toDelete && toDelete !== 'true' && toDelete !== 'false') {
+    res.status(400).json({
+      error: 'Invalid to delete: must be true or false.'
+    });
+  }
+
+  next();
+};
+
+const isEditedFreetContentValid = async (req: Request, res: Response, next: NextFunction) => {
+  const {content} = req.body as {content: string};
+
+  if (content.length > 140) {
+    res.status(413).json({
+      error: 'Freet content must be no more than 140 characters.'
+    });
+    return;
+  }
+
+  next();
+};
+
 export {
   isValidFreetContent,
   isFreetExists,
-  isValidFreetModifier
+  isValidFreetModifier,
+  doesFreetExistGeneral,
+  isValidDate,
+  isValidComment,
+  isValidToDelete,
+  isEditedFreetContentValid,
+  doesFreetExistGeneralDelete
 };

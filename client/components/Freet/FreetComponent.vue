@@ -35,6 +35,50 @@
           🗑️ Delete
         </button>
       </div>
+      <div
+        v-if="$store.state.userId!== null"
+      >
+        <button
+          v-if="!liked"
+          @click="like"
+        > 
+          👍 Like
+        </button>
+
+        <button
+          v-if="liked"
+          @click="removeLike"
+        > 
+          👍 Remove like
+        </button>
+        <button
+          v-if="!refreeted"
+          @click="refreet"
+        > 
+          🔄 Refreet
+        </button>
+
+        <button
+          v-if="refreeted"
+          @click="refreet"
+        > 
+          🔄 Remove refreet
+        </button>
+
+        <button
+          v-if="!downvoted"
+          @click="downvote"
+        > 
+          ⬇️ Downvote
+        </button>
+
+        <button
+          v-if="downvoted"
+          @click="downvote"
+        > 
+          ⬇️ Remove downvote
+        </button>
+      </div>
     </header>
     <textarea
       v-if="editing"
@@ -77,11 +121,38 @@ export default {
   data() {
     return {
       editing: false, // Whether or not this freet is in edit mode
+      liked: this.freet.likers.includes(this.$store.state.userId),
+      refreeted: this.freet.refreeters.includes(this.$store.state.userId),
+      downvoted: this.freet.downvoters.includes(this.$store.state.userId),
       draft: this.freet.content, // Potentially-new content for this freet
       alerts: {} // Displays success/error messages encountered during freet modification
     };
   },
   methods: {
+    like(){
+      this.liked = true
+      this.likeRequest()
+    },
+    removeLike(){
+      this.liked = false
+      this.likeRequest()
+    },
+    refreet(){
+      this.refreeted = true
+      this.refreetRequest()
+    },
+    removeRefreet(){
+      this.refreeted = false
+      this.refreetRequest()
+    },
+    downvote(){
+      this.downvoted = true
+      this.downvoteRequest()
+    },
+    removeDownvote(){
+      this.downvoted = false
+      this.downvoteRequest()
+    },
     startEditing() {
       /**
        * Enables edit mode on this freet.
@@ -160,6 +231,96 @@ export default {
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    },
+    async likeRequest() {
+      if (this.liked){
+        try {
+        const fields = {freetId: this.freet._id};
+        const r = await  fetch('/api/likes', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
+        }
+        this.$store.commit('refreshFreets');
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+      } else {
+        try {
+        const r = await    fetch(`/api/likes?freetId=${ this.freet._id}`, {method: 'DELETE'})
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
+        }
+        this.$store.commit('refreshFreets');
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+      }
+    },
+    async refreetRequest() {
+      if (this.liked){
+        try {
+        const fields = {freetId: this.freet._id};
+        const r = await  fetch('/api/refreets', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
+        }
+        this.$store.commit('refreshFreets');
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+      } else {
+        try {
+        const r = await    fetch(`/api/refreets?freetId=${ this.freet._id}`, {method: 'DELETE'})
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
+        }
+        this.$store.commit('refreshFreets');
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+      }
+    },
+    async downvoteRequest() {
+      if (this.liked){
+        try {
+        const fields = {freetId: this.freet._id};
+        const r = await  fetch('/api/downvotes', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
+        }
+        this.$store.commit('refreshFreets');
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+      } else {
+        try {
+        const r = await    fetch(`/api/downvotes?freetId=${ this.freet._id}`, {method: 'DELETE'})
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
+        }
+        this.$store.commit('refreshFreets');
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
       }
     }
   }

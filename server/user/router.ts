@@ -102,11 +102,12 @@ router.post(
   [
     userValidator.isUserLoggedOut,
     userValidator.isValidUsername,
+    userValidator.isValidDisplayName,
     userValidator.isUsernameNotAlreadyInUse,
     userValidator.isValidPassword
   ],
   async (req: Request, res: Response) => {
-    const user = await UserCollection.addOne(req.body.username, req.body.password);
+    const user = await UserCollection.addOne(req.body.username, req.body.password, req.body.displayName);
     req.session.userId = user._id.toString();
     res.status(201).json({
       message: `Your account was created successfully. You have been logged in as ${user.username}`,
@@ -118,7 +119,7 @@ router.post(
 /**
  * Update a user's profile.
  *
- * @name PATCH /api/users
+ * @name PUT /api/users
  *
  * @param {string} username - The user's new username
  * @param {string} password - The user's new password
@@ -127,13 +128,14 @@ router.post(
  * @throws {409} - If username already taken
  * @throws {400} - If username or password are not of the correct format
  */
-router.patch(
+router.put(
   '/',
   [
     userValidator.isUserLoggedIn,
     userValidator.isValidUsername,
     userValidator.isUsernameNotAlreadyInUse,
-    userValidator.isValidPassword
+    userValidator.isValidPassword,
+    userValidator.isValidPrivacySetting
   ],
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ''; // Will not be an empty string since its validated in isUserLoggedIn
@@ -166,6 +168,39 @@ router.delete(
     res.status(200).json({
       message: 'Your account has been deleted successfully.'
     });
+  }
+);
+
+router.get(
+  '/:userId',
+  [
+    userValidator.doesUserExist
+  ],
+  async (req: Request, res: Response) => {
+    const {userId} = req.params;
+    const user = await UserCollection.findOneByUserId(userId);
+    res.status(200).json({
+      message: 'User was fetched successfully.',
+      user: util.constructUserResponse(user)
+    });
+  }
+);
+
+router.get(
+  '/',
+  [
+    userValidator.isValidUsername
+  ],
+  async (req: Request, res: Response) => {
+    const username = req.query.username as string;
+    if (!username) {
+      res.status(400).json({error: 'Username must be nonempty.'});
+      return;
+    }
+
+    const users = await UserCollection.findManyByUsername(username);
+    const response = users.map(util.constructUserResponse);
+    res.status(200).json(response);
   }
 );
 
