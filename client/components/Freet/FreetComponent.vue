@@ -60,7 +60,7 @@
 
         <button
           v-if="refreeted"
-          @click="refreet"
+          @click="removeRefreet"
         > 
           🔄 Remove refreet
         </button>
@@ -74,7 +74,7 @@
 
         <button
           v-if="downvoted"
-          @click="downvote"
+          @click="removeDownvote"
         > 
           ⬇️ Remove downvote
         </button>
@@ -264,7 +264,7 @@ export default {
       }
     },
     async refreetRequest() {
-      if (this.liked){
+      if (this.refreeted){
         try {
         const fields = {freetId: this.freet._id};
         const r = await  fetch('/api/refreets', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
@@ -280,7 +280,7 @@ export default {
       }
       } else {
         try {
-        const r = await    fetch(`/api/refreets?freetId=${ this.freet._id}`, {method: 'DELETE'})
+        const r = await fetch(`/api/refreets?freetId=${this.freet._id}`, {method: 'DELETE'})
         if (!r.ok) {
           const res = await r.json();
           throw new Error(res.error);
@@ -294,7 +294,7 @@ export default {
       }
     },
     async downvoteRequest() {
-      if (this.liked){
+      if (this.downvoted){
         try {
         const fields = {freetId: this.freet._id};
         const r = await  fetch('/api/downvotes', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
