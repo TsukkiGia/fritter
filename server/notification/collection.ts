@@ -18,6 +18,14 @@ class NotificationCollection {
     return notification;
   }
 
+  static async deleteNotification(receivingUser: string, sendingUser: string, notifFreet: string, notifType: string): Promise<boolean> {
+    const notification = await NotificationModel.deleteOne({notificationReceiver: receivingUser,
+      notificationType: notifType,
+      notificationSender: sendingUser,
+      notificationFreet: notifFreet});
+    return notification !== null;
+  }
+
   static async addFollowNotification(receivingUser: string, sendingUser: string, notifType: string, isFollowRequest: boolean): Promise<HydratedDocument<Notification>> {
     if (isFollowRequest) {
       const notification = new NotificationModel(
@@ -53,7 +61,7 @@ class NotificationCollection {
   }
 
   static async getNotificationsForUser(receivingUser: string): Promise<Array<HydratedDocument<Notification>>> {
-    return NotificationModel.find({notificationReceiver: receivingUser});
+    return NotificationModel.find({notificationReceiver: receivingUser}).populate('notificationSender');
   }
 
   static async findOneByNotificationId(notificationId: Types.ObjectId): Promise<HydratedDocument<Notification>> {

@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+
 import type {Request, Response, NextFunction} from 'express';
 import {Types} from 'mongoose';
-import FreetCollection from '../freet/collection';
+import FreetCollection from './collection';
 import moment from 'moment';
 
 /**
@@ -137,18 +137,6 @@ const isValidDate = async (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-const isValidComment = async (req: Request, res: Response, next: NextFunction) => {
-  const commentPropagation = req.body.commentPropagation as string;
-  if (commentPropagation !== 'true' && commentPropagation !== 'false') {
-    res.status(400).json({
-      error: 'Invalid comment propagation. Must be true or false'
-    });
-    return;
-  }
-
-  next();
-};
-
 const isValidToDelete = async (req: Request, res: Response, next: NextFunction) => {
   const toDelete = req.body.toDelete as string;
   if (toDelete && toDelete !== 'true' && toDelete !== 'false') {
@@ -162,12 +150,13 @@ const isValidToDelete = async (req: Request, res: Response, next: NextFunction) 
 
 const isEditedFreetContentValid = async (req: Request, res: Response, next: NextFunction) => {
   const {content} = req.body as {content: string};
-
-  if (content.length > 140) {
-    res.status(413).json({
-      error: 'Freet content must be no more than 140 characters.'
-    });
-    return;
+  if (content) {
+    if (content.length > 140) {
+      res.status(413).json({
+        error: 'Freet content must be no more than 140 characters.'
+      });
+      return;
+    }
   }
 
   next();
@@ -179,7 +168,6 @@ export {
   isValidFreetModifier,
   doesFreetExistGeneral,
   isValidDate,
-  isValidComment,
   isValidToDelete,
   isEditedFreetContentValid,
   doesFreetExistGeneralDelete

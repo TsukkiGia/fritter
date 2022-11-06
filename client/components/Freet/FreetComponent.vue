@@ -6,12 +6,78 @@
     class="freet"
   >
     <header>
-      <h3 class="author">
-        @{{ freet.author }}
-      </h3>
-      <div
+      <div class="container">
+        <router-link
+          :to="userPath"
+          style="text-decoration: none; color: inherit;"
+        >
+          <div>
+            <img 
+              v-if="freet.profilePictureColor === 'red'"
+              src="../../public/1.png"
+            >
+            <img 
+              v-if="freet.profilePictureColor === 'orange'"
+              src="../../public/2.png"
+            >
+            <img 
+              v-if="freet.profilePictureColor === 'yellow'"
+              src="../../public/3.png"
+            >
+            <img 
+              v-if="freet.profilePictureColor === 'green'"
+              src="../../public/5.png"
+            >
+            <img 
+              v-if="freet.profilePictureColor === 'blue'"
+              src="../../public/5.png"
+            >
+            <img 
+              v-if="freet.profilePictureColor === 'purple'"
+              src="../../public/6.png"
+            >
+            <img 
+              v-if="freet.profilePictureColor === 'pink'"
+              src="../../public/7.png"
+            >
+          </div>
+        </router-link>
+        <div class="user-bio">
+          <h3 class="author">
+            {{ freet.displayName }} <span class="username">@{{ freet.author }}</span>
+          </h3>
+        </div>
+        <div class="date">
+          {{ ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][date.getMonth()] }} {{ date.getDate() }}, {{ date.getFullYear() }}
+        </div>
+      </div>
+    </header>
+    <textarea
+      v-if="editing"
+      class="content"
+      :value="draft"
+      @input="draft = $event.target.value"
+    />
+    <p
+      v-else
+      class="content"
+    >
+      <router-link
+        :to="path"
+        style="text-decoration: none; color: inherit;"
+      >
+        {{ freet.content }}
+      </router-link>
+    </p>
+    <p class="info">
+      <i v-if="freet.edited">(edited)</i>
+    </p>
+    <div
+     
+      class="actions"
+    >
+      <span
         v-if="$store.state.username === freet.author"
-        class="actions"
       >
         <button
           v-if="editing"
@@ -31,71 +97,65 @@
         >
           ✏️ Edit
         </button>
-        <button @click="deleteFreet">
+        <button 
+          v-if="!freet.timeOfDeletion"
+          @click="deleteFreet"
+        >
           🗑️ Delete
         </button>
-      </div>
-      <div
-        v-if="$store.state.userId!== null"
+        <button 
+          v-if="freet.timeOfDeletion"
+          @click="restoreFreet"
+        >
+          🗑️ Restore
+        </button>
+      </span>
+      <span
+        v-if="$store.state.userId !== null"
       >
         <button
           v-if="!liked"
-          @click="like"
+          @click="likeRequest"
         > 
           👍 Like
         </button>
 
         <button
           v-if="liked"
-          @click="removeLike"
+          @click="likeRequest"
         > 
           👍 Remove like
         </button>
         <button
           v-if="!refreeted"
-          @click="refreet"
+          @click="refreetRequest"
         > 
           🔄 Refreet
         </button>
 
         <button
           v-if="refreeted"
-          @click="removeRefreet"
+          @click="refreetRequest"
         > 
           🔄 Remove refreet
         </button>
 
         <button
           v-if="!downvoted"
-          @click="downvote"
+          @click="downvoteRequest"
         > 
           ⬇️ Downvote
         </button>
 
         <button
           v-if="downvoted"
-          @click="removeDownvote"
+          @click="downvoteRequest"
         > 
           ⬇️ Remove downvote
         </button>
-      </div>
-    </header>
-    <textarea
-      v-if="editing"
-      class="content"
-      :value="draft"
-      @input="draft = $event.target.value"
-    />
-    <p
-      v-else
-      class="content"
-    >
-      {{ freet.content }}
-    </p>
-    <p class="info">
-      Posted at {{ freet.dateModified }}
-      <i v-if="freet.edited">(edited)</i>
-    </p>
+      </span>
+    </div>
+
     <section class="alerts">
       <article
         v-for="(status, alert, index) in alerts"
@@ -109,6 +169,7 @@
 </template>
 
 <script>
+import moment from 'moment';
 export default {
   name: 'FreetComponent',
   props: {
@@ -116,43 +177,33 @@ export default {
     freet: {
       type: Object,
       required: true
+    },
+    inProfile: {
+      type: Boolean
     }
   },
   data() {
     return {
       editing: false, // Whether or not this freet is in edit mode
-      liked: this.freet.likers.includes(this.$store.state.userId),
-      refreeted: this.freet.refreeters.includes(this.$store.state.userId),
-      downvoted: this.freet.downvoters.includes(this.$store.state.userId),
       draft: this.freet.content, // Potentially-new content for this freet
-      alerts: {} // Displays success/error messages encountered during freet modification
+      alerts: {}, // Displays success/error messages encountered during freet modification
+      date: moment(this.freet.dateModified, 'MMMM Do YYYY, h:mm:ss a').toDate(),
+      path: `freet/${this.freet._id}`,
+      userPath: this.inProfile ? `${this.freet.authorId}` : `profile/${this.freet.authorId}`
     };
   },
+  computed: {
+    liked() {
+      return this.freet.likers.includes(this.$store.state.userId);
+    },
+    refreeted() {
+      return this.freet.refreeters.includes(this.$store.state.userId);
+    },
+    downvoted() {
+      return this.freet.downvoters.includes(this.$store.state.userId);
+    }
+  },
   methods: {
-    like(){
-      this.liked = true
-      this.likeRequest()
-    },
-    removeLike(){
-      this.liked = false
-      this.likeRequest()
-    },
-    refreet(){
-      this.refreeted = true
-      this.refreetRequest()
-    },
-    removeRefreet(){
-      this.refreeted = false
-      this.refreetRequest()
-    },
-    downvote(){
-      this.downvoted = true
-      this.downvoteRequest()
-    },
-    removeDownvote(){
-      this.downvoted = false
-      this.downvoteRequest()
-    },
     startEditing() {
       /**
        * Enables edit mode on this freet.
@@ -167,21 +218,90 @@ export default {
       this.editing = false;
       this.draft = this.freet.content;
     },
-    deleteFreet() {
-      /**
-       * Deletes this freet.
-       */
-      const params = {
-        method: 'DELETE',
-        callback: () => {
-          this.$store.commit('alert', {
-            message: 'Successfully deleted freet!', status: 'success'
-          });
+    async addNotification(notificationType){
+      const notificationReceiver = this.freet.authorId;
+      const notificationFreet = this.freet._id;
+      const fields = {notificationReceiver, notificationFreet, notificationType};
+      try {
+          const r = await fetch('/api/notifications', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
+          if (!r.ok) {
+            const res = await r.json();
+            throw new Error(res.error);
+          }
+          if (!this.$store.currentFreetId){
+            this.$store.commit('refreshComments');
+          }
+          this.$store.commit('refreshFreets');
+
+        } catch (e) {
+          this.$set(this.alerts, e, 'error');
+          setTimeout(() => this.$delete(this.alerts, e), 3000);
         }
-      };
-      this.request(params);
     },
-    submitEdit() {
+    async deleteNotification(notificationType){
+      const notificationReceiver = this.freet.authorId;
+      const notificationFreet = this.freet._id;
+      const fields = {notificationReceiver, notificationFreet, notificationType};
+      try {
+          const r = await  fetch('/api/notifications', {method: 'DELETE', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
+          if (!r.ok) {
+            const res = await r.json();
+            throw new Error(res.error);
+          }
+          if (!this.$store.currentFreetId){
+            this.$store.commit('refreshComments');
+          }
+          this.$store.commit('refreshFreets');
+
+        } catch (e) {
+          this.$set(this.alerts, e, 'error');
+          setTimeout(() => this.$delete(this.alerts, e), 3000);
+        }
+    },
+    async deleteFreet() {
+      /**
+       * Delete this freet.
+       */
+       try {
+        const fields = {toDelete: 'true'};
+        const r = await  fetch(`/api/freets/${this.freet._id}`, {method: 'PUT', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
+        }
+        if (!this.$store.currentFreetId){
+          this.$store.commit('refreshComments');
+        }
+        this.$store.commit('refreshFreets');
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    },
+    async restoreFreet() {
+      /**
+       * Restores this freet.
+       */
+       try {
+        const fields = {toDelete: 'false'};
+        const r = await  fetch(`/api/freets/${this.freet._id}`, {method: 'PUT', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
+        }
+        if (!this.$store.currentFreetId){
+          this.$store.commit('refreshComments');
+        }
+        this.$store.commit('refreshFreets');
+        this.$store.commit('refreshDeletedFreets');
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    },
+    async submitEdit() {
       /**
        * Updates freet to have the submitted draft content.
        */
@@ -191,17 +311,24 @@ export default {
         setTimeout(() => this.$delete(this.alerts, error), 3000);
         return;
       }
-
-      const params = {
-        method: 'PATCH',
-        message: 'Successfully edited freet!',
-        body: JSON.stringify({content: this.draft}),
-        callback: () => {
-          this.$set(this.alerts, params.message, 'success');
-          setTimeout(() => this.$delete(this.alerts, params.message), 3000);
+      try {
+        const fields = {content: this.draft};
+        const r = await  fetch(`/api/freets/${this.freet._id}`, {method: 'PUT', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
         }
-      };
-      this.request(params);
+        if (!this.$store.currentFreetId){
+          this.$store.commit('refreshComments');
+        }
+        this.editing = false;
+        this.$store.commit('refreshFreets');
+        
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
     },
     async request(params) {
       /**
@@ -234,37 +361,43 @@ export default {
       }
     },
     async likeRequest() {
-      if (this.liked){
+      if (!this.liked){
         try {
-        const fields = {freetId: this.freet._id};
-        const r = await  fetch('/api/likes', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
-        if (!r.ok) {
-          const res = await r.json();
-          throw new Error(res.error);
+          const fields = {freetId: this.freet._id};
+          const r = await  fetch('/api/likes', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
+          if (!r.ok) {
+            const res = await r.json();
+            throw new Error(res.error);
+          }
+          if (!this.$store.currentFreetId){
+            this.$store.commit('refreshComments');
+          }
+          this.$store.commit('refreshFreets');
+          this.addNotification("like");
+        } catch (e) {
+          this.$set(this.alerts, e, 'error');
+          setTimeout(() => this.$delete(this.alerts, e), 3000);
         }
-        this.$store.commit('refreshFreets');
-
-      } catch (e) {
-        this.$set(this.alerts, e, 'error');
-        setTimeout(() => this.$delete(this.alerts, e), 3000);
-      }
       } else {
         try {
-        const r = await    fetch(`/api/likes?freetId=${ this.freet._id}`, {method: 'DELETE'})
-        if (!r.ok) {
-          const res = await r.json();
-          throw new Error(res.error);
+          const r = await fetch(`/api/likes?freetId=${ this.freet._id}`, {method: 'DELETE'})
+          if (!r.ok) {
+            const res = await r.json();
+            throw new Error(res.error);
+          }
+          if (!this.$store.currentFreetId){
+            this.$store.commit('refreshComments');
+          }
+          this.$store.commit('refreshFreets');
+          this.deleteNotification("like");
+        } catch (e) {
+          this.$set(this.alerts, e, 'error');
+          setTimeout(() => this.$delete(this.alerts, e), 3000);
         }
-        this.$store.commit('refreshFreets');
-
-      } catch (e) {
-        this.$set(this.alerts, e, 'error');
-        setTimeout(() => this.$delete(this.alerts, e), 3000);
-      }
       }
     },
     async refreetRequest() {
-      if (this.refreeted){
+      if (!this.refreeted){
         try {
         const fields = {freetId: this.freet._id};
         const r = await  fetch('/api/refreets', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
@@ -272,8 +405,11 @@ export default {
           const res = await r.json();
           throw new Error(res.error);
         }
+        if (!this.$store.currentFreetId){
+          this.$store.commit('refreshComments');
+        }
         this.$store.commit('refreshFreets');
-
+        this.addNotification("refreet");
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
@@ -285,8 +421,11 @@ export default {
           const res = await r.json();
           throw new Error(res.error);
         }
+        if (!this.$store.currentFreetId){
+          this.$store.commit('refreshComments');
+        }
         this.$store.commit('refreshFreets');
-
+        this.deleteNotification("refreet");
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
@@ -294,13 +433,16 @@ export default {
       }
     },
     async downvoteRequest() {
-      if (this.downvoted){
+      if (!this.downvoted){
         try {
         const fields = {freetId: this.freet._id};
         const r = await  fetch('/api/downvotes', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
         if (!r.ok) {
           const res = await r.json();
           throw new Error(res.error);
+        }
+        if (!this.$store.currentFreetId){
+          this.$store.commit('refreshComments');
         }
         this.$store.commit('refreshFreets');
 
@@ -315,6 +457,9 @@ export default {
           const res = await r.json();
           throw new Error(res.error);
         }
+        if (!this.$store.currentFreetId){
+          this.$store.commit('refreshComments');
+        }
         this.$store.commit('refreshFreets');
 
       } catch (e) {
@@ -328,9 +473,60 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 0px;
+}
 .freet {
-    border: 1px solid #111;
-    padding: 20px;
+    box-shadow: 0px 2px 5px rgb(141, 156, 160);
+    padding: 15px;
     position: relative;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background-color: #fff;
+}
+.actions button {
+  margin-top: 10px;
+  margin-right: 15px;
+}
+.author {
+  color: #24b2e1;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.content {
+  color: #898b8c;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.username {
+  font-size: 15px;
+  color: rgb(190, 186, 186);
+  padding-left: 5px;
+}
+.user-bio {
+  margin-bottom: 8px;
+}
+img {
+  height: 50px;
+  margin-right: 20px;
+}
+.date {
+  font-size: 15px;
+  color: rgb(190, 186, 186);
+  font-family: Arial, Helvetica, sans-serif;
+  margin-left: 20px;
+}
+
+button {
+  background-color: #24b2e1;
+  color: white;
+  border: 2px solid #24b2e1; 
+  border-radius: 5px;
+  padding-left:5px;
+  padding-right:5px;
+  box-shadow: 0px 1px 2px rgb(141, 156, 160);
+  font-size: 15px;
+
 }
 </style>

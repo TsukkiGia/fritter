@@ -14,6 +14,7 @@ export default {
       setUsername: true,
       fields: [
         {id: 'username', label: 'Username', value: ''},
+        {id: 'displayName', label: 'Display Name', value: ''},
         {id: 'password', label: 'Password', value: ''}
       ],
       title: 'Create account',

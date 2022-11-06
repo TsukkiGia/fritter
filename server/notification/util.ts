@@ -7,7 +7,7 @@ type FreetNotificationResponse = {
   notificationReceiver: string;
   notificationType: string;
   notificationTime: string;
-  notificationSender: string;
+  notificationSender: object;
   notificationFreet: string;
 };
 
@@ -16,7 +16,7 @@ type FollowNotificationResponse = {
   notificationReceiver: string;
   notificationType: string;
   notificationTime: string;
-  notificationSender: string;
+  notificationSender: object;
   hasAcceptedFollowRequest: string;
 };
 
@@ -34,7 +34,7 @@ const constructFreetNotificationResponse = (notification: HydratedDocument<Notif
     notificationReceiver: notification.notificationReceiver.toString(),
     notificationType: notification.notificationType.toString(),
     notificationTime: formatDate(notification.notificationTime),
-    notificationSender: notification.notificationSender.toString(),
+    notificationSender: notification.notificationSender,
     notificationFreet: notification.notificationFreet.toString()
   });
 
@@ -44,7 +44,7 @@ const constructFollowNotificationResponse = (notification: HydratedDocument<Noti
     notificationReceiver: notification.notificationReceiver.toString(),
     notificationType: notification.notificationType.toString(),
     notificationTime: formatDate(notification.notificationTime),
-    notificationSender: notification.notificationSender.toString(),
+    notificationSender: notification.notificationSender,
     hasAcceptedFollowRequest: notification.hasAcceptedFollowRequest === undefined ? '' : notification.hasAcceptedFollowRequest.toString()
   });
 

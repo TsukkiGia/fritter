@@ -3,36 +3,120 @@
 
 <template>
   <main>
-    <section>
-      <header>
-        <h2>Account settings for @{{ $store.state.username }}</h2>
-      </header>
-      <ChangeUsernameForm />
-      <ChangePasswordForm />
-    </section>
-    <section>
-      <header>
-        <h2>Account management</h2>
-      </header>
-      <LogoutForm />
-      <DeleteAccountForm />
-    </section>
+    <div class="container">
+      <div class="navbar">
+        <h2>Settings</h2>
+        <hr>
+        <p
+          :class="{selected: viewingTab ==='management'}"
+          @click="setViewingTab('management')"
+        >
+          Account Management
+        </p>
+        <p
+          :class="{selected: viewingTab ==='anb'}"
+          @click="setViewingTab('anb')"
+        >
+          A New Beginning
+        </p>
+        <p
+          :class="{selected: viewingTab ==='freetbin'}"
+          @click="setViewingTab('freetbin')"
+        >
+          Freet Bin
+        </p>
+      </div>
+      <div class="content">
+        <section
+          v-if="viewingTab === 'management'"
+        >
+          <header>
+            <h2>Account settings for @{{ $store.state.username }}</h2>
+            <hr>
+          </header>
+          <ChangeUsernameForm />
+          <ChangePasswordForm />
+          <ChangeDisplayNameForm />
+          <header>
+            <h2>Account management</h2>
+          </header>
+          <LogoutForm />
+          <DeleteAccountForm />
+          <header>
+            <h2>Account Privacy</h2>
+          </header>
+          <PrivatePage />
+        </section>
+        <section v-if="viewingTab === 'freetbin'">
+          <FreetsBinPage />
+        </section>
+        <section v-if="viewingTab === 'anb'">
+          <ANewBeginningPage />
+        </section>
+      </div>
+    </div>
   </main>
 </template>
 
 <script>
 import ChangeUsernameForm from '@/components/Account/ChangeUsernameForm.vue';
 import ChangePasswordForm from '@/components/Account/ChangePasswordForm.vue';
+import ChangeDisplayNameForm from '@/components/Account/ChangeDisplayNameForm.vue';
 import DeleteAccountForm from '@/components/Account/DeleteAccountForm.vue';
+import PrivatePage from '@/components/Account/PrivatePage.vue';
 import LogoutForm from '@/components/Account/LogoutForm.vue';
+import ANewBeginningPage from '@/components/Account/ANewBeginningPage.vue';
+import FreetsBinPage from '@/components/Freet/FreetsBinPage.vue';
 
 export default {
   name: 'AccountPage',
   components: {
     ChangeUsernameForm,
     ChangePasswordForm,
+    ChangeDisplayNameForm,
     DeleteAccountForm,
-    LogoutForm
+    LogoutForm,
+    PrivatePage,
+    FreetsBinPage,
+    ANewBeginningPage
+  },
+  data() {
+    return {
+      viewingTab : "management"
+    }
+  },
+  methods: {
+    setViewingTab(tab){
+      this.viewingTab = tab;
+    }
   }
 };
 </script>
+
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: row;
+  gap: 150px;
+}
+.navbar {
+  margin-top: 5px;
+  padding: 0px;
+  font-family: Arial;
+  width: 15%;
+}
+.navbar p{
+  cursor: pointer;
+}
+.content {
+  margin-top: 5px;
+  padding: 0px;
+  font-family: Arial;
+  width: 85%;
+}
+
+.selected {
+  color: #24b2e1;
+  font-weight: bolder;
+}
+</style>

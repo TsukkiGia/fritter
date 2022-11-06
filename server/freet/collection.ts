@@ -50,11 +50,11 @@ class FreetCollection {
 
   static async findManyByContents(contents: string): Promise<Array<HydratedDocument<Freet>>> {
     const regex = new RegExp(contents, 'i');
-    return FreetModel.find({content: {$regex: regex}, timeOfDeletion: null});
+    return FreetModel.find({content: {$regex: regex}, timeOfDeletion: null}).populate('authorId');
   }
 
   static async findCommentsOfFreet(parentFreet: string): Promise<Array<HydratedDocument<Freet>>> {
-    return FreetModel.find({parentFreet, timeOfDeletion: null});
+    return FreetModel.find({parentFreet, timeOfDeletion: null}).sort({dateModified: -1}).populate('authorId');
   }
 
   // Gets freets that were deleted after a specific date (will be 30 days before)
@@ -64,7 +64,7 @@ class FreetCollection {
     return FreetModel.find({authorId: userId,
       timeOfDeletion: {
         $gt: deadlineDate
-      }});
+      }}).populate('authorId');
   }
 
   // Gets freets that are not deleted before a specific date

@@ -10,6 +10,9 @@ import DownvoteCollection from '../downvote/collection';
 type FreetResponse = {
   _id: string;
   author: string;
+  displayName: string;
+  authorId: string;
+  profilePictureColor: string;
   dateCreated: string;
   content: string;
   dateModified: string;
@@ -66,7 +69,7 @@ const constructFreetResponse = async (freet: HydratedDocument<Freet>): Promise<F
       versionKey: false // Cosmetics; prevents returning of __v property
     })
   };
-  const {username} = freetCopy.authorId;
+  const {username, displayName, profilePictureColor, _id} = freetCopy.authorId;
   const likes = await LikeCollection.getLikesOfItem(freet._id.toString());
   const refreets = await RefreetCollection.getRefreetsofItem(freet._id.toString());
   const downvotes = await DownvoteCollection.getDownvotesOfItem(freet._id.toString());
@@ -91,6 +94,9 @@ const constructFreetResponse = async (freet: HydratedDocument<Freet>): Promise<F
     ...freetCopy,
     _id: freetCopy._id.toString(),
     author: username,
+    displayName,
+    authorId: _id.toString(),
+    profilePictureColor,
     dateCreated: formatDate(freet.dateCreated),
     dateModified: formatDate(freet.dateModified),
     timeOfDeletion: (freet.timeOfDeletion === null || freet.timeOfDeletion === undefined) ? '' : formatDate(freet.timeOfDeletion),

@@ -5,26 +5,43 @@
 <template>
   <nav>
     <div class="left">
-      <img src="../../public/logo.svg">
+      <img src="../../public/logo2.png">
       <h1 class="title">
-        Fritter
+        fritter 
       </h1>
     </div>
     <div class="right">
       <router-link to="/">
-        Home
+        <span :class="{selected: $route.name === 'Home'}">Home </span>
       </router-link>
       <router-link
         v-if="$store.state.username"
         to="/account"
       >
-        Account
+        <span :class="{selected: $route.name === 'Account'}">Account </span>
       </router-link>
       <router-link
         v-else
         to="/login"
       >
-        Login
+        <span :class="{selected: $route.name === 'Login'}">Login </span>
+      </router-link>
+      <router-link
+        v-if="$store.state.username"
+        to="/notifications"
+      >
+        <span :class="{selected: $route.name === 'Notifications'}">Notifications </span>
+      </router-link>
+      <router-link
+        to="/search"
+      >
+        <span :class="{selected: $route.name === 'Search'}">Search </span>
+      </router-link>
+      <router-link
+      v-if="$store.state.username"
+        :to="`/profile/${$store.state.userId}`"
+      >
+        <span :class="{selected: $route.name === 'Profile' && $route.params.id === $store.state.userId}">Profile </span>
       </router-link>
     </div>
     <section class="alerts">
@@ -42,16 +59,19 @@
 <style scoped>
 nav {
     padding: 1vw 2vw;
-    background-color: #ccc;
+    background-color: #24b2e1;
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: relative;
+    box-shadow: 0px 2px 5px rgb(141, 156, 160);
 }
 
 .title {
     font-size: 32px;
     margin: 0 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fff
 }
 
 img {
@@ -72,10 +92,18 @@ img {
 }
 
 .right a {
-    margin-left: 5px;
+    margin-left: 10px;
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    text-decoration: none;
 }
 
 .alerts {
     width: 25%;
+}
+.selected {
+  font-weight: bold;
+  text-shadow: 0px 1px 2px rgb(141, 156, 160);
+
 }
 </style>

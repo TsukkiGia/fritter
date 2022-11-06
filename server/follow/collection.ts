@@ -28,7 +28,7 @@ class FollowCollection {
   }
 
   static async getFollowingList(follower: string): Promise<Array<HydratedDocument<Follow>>> {
-    return FollowModel.find({follower, hasAcceptedFollowRequest: {$nin: ['sent', 'false']}});
+    return FollowModel.find({follower});
   }
 
   static async findFollowRecord(follower: string, followedUser: string): Promise<HydratedDocument<Follow>> {

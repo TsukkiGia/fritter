@@ -37,6 +37,23 @@ router.post(
   }
 );
 
+router.delete(
+  '/',
+  [
+    userValidator.isUserLoggedIn
+  ],
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = (req.session.userId as string) ?? '';
+    const notificationType = req.body.notificationType as string;
+    const notificationReceiver = req.body.notificationReceiver as string;
+    const notificationFreet = req.body.notificationFreet as string;
+    await NotificationCollection.deleteNotification(notificationReceiver, userId, notificationFreet, notificationType);
+    res.status(201).json({
+      message: `You successfully deleted a ${notificationType} notification.`
+    });
+  }
+);
+
 router.get(
   '/',
   [

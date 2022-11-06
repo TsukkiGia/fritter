@@ -201,12 +201,11 @@ router.post(
   [
     userValidator.isUserLoggedIn,
     freetValidator.isFreetExists,
-    freetValidator.isValidComment,
     freetValidator.isValidFreetContent
   ],
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ''; // Will not be an empty string since its validated in isUserLoggedIn
-    const freet = await FreetCollection.addOneComment(userId, req.body.content, req.params.freetId, req.body.commentPropagation === 'true');
+    const freet = await FreetCollection.addOneComment(userId, req.body.content, req.params.freetId, true);
 
     res.status(201).json({
       message: 'Your freet comment was created successfully.',
@@ -235,7 +234,7 @@ router.put(
     freetValidator.doesFreetExistGeneralDelete
   ],
   async (req: Request, res: Response, next: NextFunction) => {
-    if (req.body.content !== '' || req.body.toDelete !== '') {
+    if (req.body.content !== '' || req.body.toDelete !== '' || req.session.userId !== '') {
       next();
       return;
     }
