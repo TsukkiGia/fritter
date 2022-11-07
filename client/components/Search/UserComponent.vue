@@ -62,10 +62,6 @@
         user: {
           type: Object,
           required: true
-        },
-        inProfile: {
-          type: Boolean,
-          required: true
         }
       },
       data() {

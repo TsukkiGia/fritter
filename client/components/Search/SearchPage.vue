@@ -66,7 +66,6 @@
         v-for="user in $store.state.searchResults"
         :key="user.id"
         :user="user"
-        :in-profile="false"
       />
       <h2 v-if="$store.state.searchResults.length === 0">
         No Users Found!
