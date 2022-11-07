@@ -4,7 +4,7 @@ import RefreetModel from './model';
 
 class RefreetCollection {
   static async addRefreet(refreeter: string, refreetedItem: string): Promise<HydratedDocument<Refreet>> {
-    const refreet = new RefreetModel({refreeter, refreetedItem, freetDeleted: false});
+    const refreet = new RefreetModel({refreeter, refreetedItem, freetDeleted: false, dateCreated: Date()});
     await refreet.save();
     return refreet;
   }

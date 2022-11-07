@@ -83,7 +83,7 @@
           </button>
         </router-link>
       </section>
-      <section>
+      <section v-if="($store.state.userId === $route.params.id) || (user.isPrivate === 'false') || (user.isPrivate === 'true' && followStatus === 'yes')">
         <FreetComponent
           v-for="freet in $store.state.profileFreets"
           :key="freet.id"
@@ -183,6 +183,7 @@
             }
     
             await this.fetchFollowing();
+            this.deleteFollowNotification();
             } catch (e) {
             
     
@@ -221,7 +222,10 @@
             if (userObj.followedUser === userId && !userObj.hasAcceptedFollowRequest){
               return "yes";
             }
-            if (userObj.followedUser === userId && userObj.hasAcceptedFollowRequest){
+            if (userObj.followedUser === userId && userObj.hasAcceptedFollowRequest === 'true'){
+              return "yes";
+            }
+            if (userObj.followedUser === userId && userObj.hasAcceptedFollowRequest !== 'true'){
               return "requested";
             }
           }

@@ -5,6 +5,7 @@ import UserCollection from '../user/collection';
 import LikeCollection from '../like/collection';
 import RefreetCollection from '../refreet/collection';
 import DownvoteCollection from '../downvote/collection';
+import FollowCollection from '../follow/collection';
 
 // Update this if you add a property to the Freet type!
 type FreetResponse = {
@@ -32,6 +33,15 @@ type FreetResponse = {
  * @returns {string} - formatted date as string
  */
 const formatDate = (date: Date): string => moment(date).format('MMMM Do YYYY, h:mm:ss a');
+
+// async function refreetsCommentsAndFreets(userId: string, freets: Freet[]): Promise<FreetResponse[]> {
+//   const followingList = await FollowCollection.getFollowingList(userId);
+//   const freetIds = [];
+//   for (const following of followingList){
+
+//   }
+//   return [];
+// }
 
 async function hideFreetsFromPrivateUsers(freets: Freet[]): Promise<Freet[]> {
   const filtered_freets = [];

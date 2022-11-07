@@ -19,6 +19,18 @@ class NotificationCollection {
   }
 
   static async deleteNotification(receivingUser: string, sendingUser: string, notifFreet: string, notifType: string): Promise<boolean> {
+    if (notifType === 'follow') {
+      const notificationOne = await NotificationModel.deleteOne({notificationReceiver: receivingUser,
+        notificationType: 'follow',
+        notificationSender: sendingUser,
+        notificationFreet: notifFreet});
+      const notificationTwo = await NotificationModel.deleteOne({notificationReceiver: receivingUser,
+        notificationType: 'followrequest',
+        notificationSender: sendingUser,
+        notificationFreet: notifFreet});
+      return notificationOne !== null || notificationTwo !== null;
+    }
+
     const notification = await NotificationModel.deleteOne({notificationReceiver: receivingUser,
       notificationType: notifType,
       notificationSender: sendingUser,

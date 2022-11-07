@@ -6,6 +6,7 @@ export type Refreet = {
   refreeter: Types.ObjectId;
   refreetedItem: Types.ObjectId;
   freetDeleted: boolean;
+  dateCreated: Date;
 };
 
 const RefreetSchema = new Schema({
@@ -19,6 +20,10 @@ const RefreetSchema = new Schema({
   },
   freetDeleted: {
     type: Boolean,
+    required: true
+  },
+  dateCreated: {
+    type: Date,
     required: true
   }
 });
