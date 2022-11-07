@@ -15,6 +15,7 @@
           <FreetComponent
             :key="freet._id"
             :freet="freet"
+            @refresh="fetchFreet"
           />
         </article>
       </section>

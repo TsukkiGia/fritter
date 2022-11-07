@@ -191,6 +191,7 @@ export default {
       return this.freet.downvoters.includes(this.$store.state.userId);
     },
     toxicityPercentage(){
+      if (this.freet.viewers.length === 0) return 0;
       return (this.freet.downvoters.length / this.freet.viewers.length) *100;
     }
   },
@@ -365,6 +366,7 @@ export default {
           }
           this.$store.commit('refreshFreets');
           this.addNotification("like");
+          this.$emit('refresh');
         } catch (e) {
           this.$set(this.alerts, e, 'error');
           setTimeout(() => this.$delete(this.alerts, e), 3000);
@@ -381,6 +383,7 @@ export default {
           }
           this.$store.commit('refreshFreets');
           this.deleteNotification("like");
+          this.$emit('refresh');
         } catch (e) {
           this.$set(this.alerts, e, 'error');
           setTimeout(() => this.$delete(this.alerts, e), 3000);
@@ -401,6 +404,7 @@ export default {
         }
         this.$store.commit('refreshFreets');
         this.addNotification("refreet");
+        this.$emit('refresh');
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
@@ -417,6 +421,7 @@ export default {
         }
         this.$store.commit('refreshFreets');
         this.deleteNotification("refreet");
+        this.$emit('refresh');
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
@@ -436,6 +441,7 @@ export default {
           this.$store.commit('refreshComments');
         }
         this.$store.commit('refreshFreets');
+        this.$emit('refresh');
 
       } catch (e) {
         this.$set(this.alerts, e, 'error');
@@ -443,7 +449,7 @@ export default {
       }
       } else {
         try {
-        const r = await    fetch(`/api/downvotes?freetId=${ this.freet._id}`, {method: 'DELETE'})
+        const r = await fetch(`/api/downvotes?freetId=${ this.freet._id}`, {method: 'DELETE'})
         if (!r.ok) {
           const res = await r.json();
           throw new Error(res.error);
@@ -452,6 +458,7 @@ export default {
           this.$store.commit('refreshComments');
         }
         this.$store.commit('refreshFreets');
+        this.$emit('refresh');
 
       } catch (e) {
         this.$set(this.alerts, e, 'error');
