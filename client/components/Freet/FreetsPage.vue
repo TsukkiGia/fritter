@@ -7,6 +7,27 @@
       class="buffer"
     >
       <CreateFreetForm />
+      <section>
+        <header class="left">
+          <h2>
+            Your Feed
+          </h2>
+        </header>
+        <section
+          v-if="$store.state.freets.length"
+        >
+          <FreetComponent
+            v-for="freet in $store.state.freets"
+            :key="freet.id"
+            :freet="freet"
+          />
+        </section>
+        <article
+          v-else
+        >
+          <h3>No freets found.</h3>
+        </article>
+      </section>
     </section>
     <section v-else>
       <header>
@@ -19,27 +40,6 @@
           </router-link>
           to create, edit, and delete freets.
         </h3>
-      </article>
-    </section>
-    <section>
-      <header class="left">
-        <h2>
-          Your Feed
-        </h2>
-      </header>
-      <section
-        v-if="$store.state.freets.length"
-      >
-        <FreetComponent
-          v-for="freet in $store.state.freets"
-          :key="freet.id"
-          :freet="freet"
-        />
-      </section>
-      <article
-        v-else
-      >
-        <h3>No freets found.</h3>
       </article>
     </section>
   </main>

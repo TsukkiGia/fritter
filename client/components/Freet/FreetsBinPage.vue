@@ -4,6 +4,20 @@
       <header>
         <h2>@{{ $store.state.username }}'s Freet Bin </h2>
       </header>
+      <section
+        v-if="$store.state.deletedFreets.length"
+      >
+        <FreetComponent
+          v-for="freet in $store.state.deletedFreets"
+          :key="freet.id"
+          :freet="freet"
+        />
+      </section>
+      <article
+        v-else
+      >
+        <h3>No deleted found.</h3>
+      </article>
     </section>
     <section v-else>
       <header>
@@ -18,20 +32,6 @@
         </h3>
       </article>
     </section>
-    <section
-      v-if="$store.state.deletedFreets.length"
-    >
-      <FreetComponent
-        v-for="freet in $store.state.deletedFreets"
-        :key="freet.id"
-        :freet="freet"
-      />
-    </section>
-    <article
-      v-else
-    >
-      <h3>No deleted found.</h3>
-    </article>
   </article>
 </template>
   

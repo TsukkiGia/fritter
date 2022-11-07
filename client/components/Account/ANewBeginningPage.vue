@@ -4,20 +4,7 @@
       <header>
         <h2>@{{ $store.state.username }}'s New Beginning </h2>
       </header>
-      <section>
-        <h1>Delete all freets before this date</h1>
-        <form @submit.prevent="submit">
-          <input
-            v-model="deadlineDate"
-            type="date"
-            class="datePicker"
-          >
-          <input
-            class="submitter"
-            type="submit"
-          >
-        </form>
-      </section>
+      <DatePicker />
     </section>
     <section v-else>
       <header>
@@ -36,38 +23,10 @@
 </template>
     
     <script>
-    
+     import DatePicker from './DatePicker.vue';
     export default {
       name: 'ANewBeginningPage',
-      data() {
-        return {
-            deadlineDate: ""
-        }
-      },
-      methods: {
-        async submit() {
-            if (this.deadlineDate !== ""){
-                let [y, m, d] = this.deadlineDate.split('-');
-                console.log(this.deadlineDate);
-                const fields = {deadlineYear: y, deadlineMonth: m, deadlineDay: d};
-                const options = {method: "PUT", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(fields)};
-                const url = `/api/freets`;
-                try {
-                    const r = await fetch(url, options);
-                    const res = await r.json();
-                    if (!r.ok) {
-                        throw new Error(res.error);
-                    }
-                    alert("You have successfully deleted your Freets before "+ this.deadlineDate);
-                    } catch (e) {
-                    
-        
-                this.$set(this.alerts, e, 'error');
-                setTimeout(() => this.$delete(this.alerts, e), 3000);
-                }
-            }
-        }
-      }
+      components: {DatePicker},
     };
     </script>
     

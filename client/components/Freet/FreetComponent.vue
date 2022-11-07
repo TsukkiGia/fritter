@@ -41,6 +41,12 @@
         {{ freet.content }}
       </router-link>
     </p>
+    <p
+      v-if="$route.name === 'Freet'"
+      class="toxicity"
+    >
+      Toxicity percentage: {{ toxicityPercentage }}%
+    </p>
     <p class="info">
       <i v-if="freet.edited">(edited)</i>
     </p>
@@ -110,20 +116,21 @@
         > 
           🔄 Remove refreet
         </button>
+        <span v-if="$route.name === 'Freet'">
+          <button
+            v-if="!downvoted"
+            @click="downvoteRequest"
+          > 
+            ⬇️ Downvote
+          </button>
 
-        <button
-          v-if="!downvoted"
-          @click="downvoteRequest"
-        > 
-          ⬇️ Downvote
-        </button>
-
-        <button
-          v-if="downvoted"
-          @click="downvoteRequest"
-        > 
-          ⬇️ Remove downvote
-        </button>
+          <button
+            v-if="downvoted"
+            @click="downvoteRequest"
+          > 
+            ⬇️ Remove downvote
+          </button>
+        </span>
       </span>
     </section>
 
@@ -146,7 +153,6 @@ export default {
   name: 'FreetComponent',
   components: {ProfilePicture},
   props: {
-    // Data from the stored freet
     freet: {
       type: Object,
       required: true
@@ -183,6 +189,9 @@ export default {
     downvoted() {
       if (this.freet === undefined) return [];
       return this.freet.downvoters.includes(this.$store.state.userId);
+    },
+    toxicityPercentage(){
+      return (this.freet.downvoters.length / this.freet.viewers.length) *100;
     }
   },
   methods: {
@@ -460,6 +469,11 @@ export default {
   flex-direction: row;
   align-items: center;
   margin-bottom: 0px;
+}
+.toxicity {
+  font-size:10pt;
+  color: #898b8c;
+  font-family: Arial, Helvetica, sans-serif
 }
 .freet {
     box-shadow: 0px 2px 5px rgb(141, 156, 160);
