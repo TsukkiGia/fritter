@@ -3,10 +3,11 @@
 
 <template>
   <main>
-    <div class="container">
-      <div class="navbar">
-        <h2>Settings</h2>
-        <hr>
+    <article class="container">
+      <nav class="navbar">
+        <header>
+          <h2>Settings</h2>
+        </header>
         <p
           :class="{selected: viewingTab ==='management'}"
           @click="setViewingTab('management')"
@@ -25,14 +26,13 @@
         >
           Freet Bin
         </p>
-      </div>
-      <div class="content">
+      </nav>
+      <section class="content">
         <section
           v-if="viewingTab === 'management'"
         >
           <header>
             <h2>Account settings for @{{ $store.state.username }}</h2>
-            <hr>
           </header>
           <ChangeUsernameForm />
           <ChangePasswordForm />
@@ -53,8 +53,8 @@
         <section v-if="viewingTab === 'anb'">
           <ANewBeginningPage />
         </section>
-      </div>
-    </div>
+      </section>
+    </article>
   </main>
 </template>
 
@@ -97,7 +97,8 @@ export default {
 .container {
   display: flex;
   flex-direction: row;
-  gap: 150px;
+  justify-content: center;
+  gap: 200px;
 }
 .navbar {
   margin-top: 5px;
@@ -112,7 +113,7 @@ export default {
   margin-top: 5px;
   padding: 0px;
   font-family: Arial;
-  width: 85%;
+  width: 45%;
 }
 
 .selected {

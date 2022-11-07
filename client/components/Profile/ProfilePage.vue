@@ -1,28 +1,29 @@
 <template>
   <main>
-    <div
+    <article
       v-if="user !== {}"
       class="ha"
     >
-      <h2>Profile</h2>
-      <div class="top">
+      <header>
+        <h2>Profile</h2>
+      </header>
+      
+      <section class="top">
         <UserComponent
           :key="user.id"
           :user="user"
-          :inProfile="true"
+          :in-profile="true"
         />
-      </div>
-      <div>
-        <section class="alerts">
-          <article
-            v-for="(status, alert, index) in alerts"
-            :key="index"
-            :class="status"
-          >
-            <p>{{ alert }}</p>
-          </article>
-        </section>
-      </div>
+      </section>
+      <section class="alerts">
+        <article
+          v-for="(status, alert, index) in alerts"
+          :key="index"
+          :class="status"
+        >
+          <p>{{ alert }}</p>
+        </article>
+      </section>
     
       <section 
         v-if="$route.params.id === $store.state.userId"
@@ -42,7 +43,7 @@
           :in-profile="true"
         />
       </section>
-    </div>
+    </article>
   </main>
 </template>
   

@@ -3,85 +3,83 @@
 
 <template>
   <article
-    class="notification"
+    class="notification container"
   >
-    <div class="container">
-      <div class="icon">
-        <img 
-          v-if="notification.notificationType == 'like'"
-          src="../../public/heart.png"
-        >
-        <img 
-          v-if="notification.notificationType == 'refreet'"
-          src="../../public/refreet.png"
-        >
-        <img 
-          v-if="notification.notificationType == 'comment'"
-          src="../../public/comment.png"
-        >
-        <img 
-          v-if="notification.notificationType == 'follow' || notification.notificationType == 'followrequest'"
-          src="../../public/follow.png"
-        >
-      </div>
+    <section class="icon">
+      <img 
+        v-if="notification.notificationType == 'like'"
+        src="../../public/heart.png"
+      >
+      <img 
+        v-if="notification.notificationType == 'refreet'"
+        src="../../public/refreet.png"
+      >
+      <img 
+        v-if="notification.notificationType == 'comment'"
+        src="../../public/comment.png"
+      >
+      <img 
+        v-if="notification.notificationType == 'follow' || notification.notificationType == 'followrequest'"
+        src="../../public/follow.png"
+      >
+    </section>
       
-      <div class="content">
-        <router-link
-          :to="path"
-          style="text-decoration: none; color: inherit;"
+    <section class="content">
+      <router-link
+        :to="path"
+        style="text-decoration: none; color: inherit;"
+      >
+        <header>
+          <h3 class="author">
+            @{{ notification.notificationSender.username }} {{
+              (notification.notificationType == "like") ? "liked your Freet" : 
+              ((notification.notificationType == "refreet") ? "refreeted your Freet" :
+                ((notification.notificationType == "comment") ? "commented on your Freet" :
+                  ((notification.notificationType == "follow") ? "followed you" : "requested to follow you"))   
+              )
+            }}
+          </h3> 
+        </header>
+        <p class="info">
+          Notification received at {{ notification.notificationTime }}
+        </p>
+      </router-link>
+      <section class="alerts">
+        <article
+          v-for="(status, alert, index) in alerts"
+          :key="index"
+          :class="status"
         >
-          <header>
-            <h3 class="author">
-              @{{ notification.notificationSender.username }} {{
-                (notification.notificationType == "like") ? "liked your Freet" : 
-                ((notification.notificationType == "refreet") ? "refreeted your Freet" :
-                  ((notification.notificationType == "comment") ? "commented on your Freet" :
-                    ((notification.notificationType == "follow") ? "followed you" : "requested to follow you"))   
-                )
-              }}
-            </h3> 
-          </header>
-          <p class="info">
-            Notification received at {{ notification.notificationTime }}
-          </p>
-        </router-link>
-        <section class="alerts">
-          <article
-            v-for="(status, alert, index) in alerts"
-            :key="index"
-            :class="status"
-          >
-            <p>{{ alert }}</p>
-          </article>
-        </section>
-      </div>
+          <p>{{ alert }}</p>
+        </article>
+      </section>
+    </section>
       
-      <div 
-        v-if="notification.hasAcceptedFollowRequest == 'received'"
-        class="follow-request"
+    <aside 
+      v-if="notification.hasAcceptedFollowRequest == 'received'"
+      class="follow-request"
+    >
+      <img 
+        src="../../public/check.png"
+        @click="acceptFollowRequest"
       >
-        <img 
-          src="../../public/check.png"
-          @click="acceptFollowRequest"
-        >
-        <img 
-          src="../../public/cross.png"
-          @click="rejectFollowRequest"
-        >
-      </div>
-      <div 
-        v-if="notification.hasAcceptedFollowRequest == 'true'"
-        class="follow-request"
+      <img 
+        src="../../public/cross.png"
+        @click="rejectFollowRequest"
       >
-        <h2>You accepted the follow request!</h2>
-      </div>
-      <div 
-        v-if="notification.hasAcceptedFollowRequest == 'false'"
-        class="follow-request"
-      >
-        <h2>You rejected the follow request!</h2>
-      </div>
-    </div>
+    </aside>
+    <aside 
+      v-if="notification.hasAcceptedFollowRequest == 'true'"
+      class="follow-request"
+    >
+      <h2>You accepted the follow request!</h2>
+    </aside>
+    <aside 
+      v-if="notification.hasAcceptedFollowRequest == 'false'"
+      class="follow-request"
+    >
+      <h2>You rejected the follow request!</h2>
+    </aside>
   </article>
 </template>
   

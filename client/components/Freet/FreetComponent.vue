@@ -5,53 +5,25 @@
   <article
     class="freet"
   >
-    <header>
-      <div class="container">
-        <router-link
-          :to="userPath"
-          style="text-decoration: none; color: inherit;"
-        >
-          <div>
-            <img 
-              v-if="freet.profilePictureColor === 'red'"
-              src="../../public/1.png"
-            >
-            <img 
-              v-if="freet.profilePictureColor === 'orange'"
-              src="../../public/2.png"
-            >
-            <img 
-              v-if="freet.profilePictureColor === 'yellow'"
-              src="../../public/3.png"
-            >
-            <img 
-              v-if="freet.profilePictureColor === 'green'"
-              src="../../public/4.png"
-            >
-            <img 
-              v-if="freet.profilePictureColor === 'blue'"
-              src="../../public/5.png"
-            >
-            <img 
-              v-if="freet.profilePictureColor === 'purple'"
-              src="../../public/6.png"
-            >
-            <img 
-              v-if="freet.profilePictureColor === 'pink'"
-              src="../../public/7.png"
-            >
-          </div>
-        </router-link>
-        <div class="user-bio">
-          <h3 class="author">
-            {{ freet.displayName }} <span class="username">@{{ freet.author }}</span>
-          </h3>
-        </div>
-        <div class="date">
-          {{ ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][date.getMonth()] }} {{ date.getDate() }}, {{ date.getFullYear() }}
-        </div>
-      </div>
-    </header>
+    <section class="container">
+      <router-link
+        :to="userPath"
+        style="text-decoration: none; color: inherit;"
+      >
+        <ProfilePicture
+          :key="freet._id"
+          :user="freet"
+        />
+      </router-link>
+      <header class="user-bio">
+        <h3 class="author">
+          {{ freet.displayName }} <span class="username">@{{ freet.author }}</span>
+        </h3>
+      </header>
+      <span class="date">
+        {{ ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][date.getMonth()] }} {{ date.getDate() }}, {{ date.getFullYear() }}
+      </span>
+    </section>
     <textarea
       v-if="editing"
       class="content"
@@ -72,8 +44,7 @@
     <p class="info">
       <i v-if="freet.edited">(edited)</i>
     </p>
-    <div
-     
+    <section
       class="actions"
     >
       <span
@@ -154,7 +125,7 @@
           ⬇️ Remove downvote
         </button>
       </span>
-    </div>
+    </section>
 
     <section class="alerts">
       <article
@@ -170,8 +141,10 @@
 
 <script>
 import moment from 'moment';
+import ProfilePicture from '../Profile/ProfilePicture.vue'
 export default {
   name: 'FreetComponent',
+  components: {ProfilePicture},
   props: {
     // Data from the stored freet
     freet: {

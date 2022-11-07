@@ -4,35 +4,31 @@
   <main>
     <section>
       <header>
-        <div>
-          <h2>
-            Search
-          </h2>
-        </div>
-        <div>
-          <form @submit.prevent="submit">
-            <input
-              v-model="value"
-              type="text"
-              placeholder="Search Query"
-            >
-            <button 
-              type="submit"
-            >
-              Search
-            </button>
-            <section class="alerts">
-              <article
-                v-for="(status, alert, index) in alerts"
-                :key="index"
-                :class="status"
-              >
-                <p>{{ alert }}</p>
-              </article>
-            </section>
-          </form>
-        </div>
+        <h2>
+          Search
+        </h2>
       </header>
+      <form @submit.prevent="submit">
+        <input
+          v-model="value"
+          type="text"
+          placeholder="Search Query"
+        >
+        <button 
+          type="submit"
+        >
+          Search
+        </button>
+      </form>
+    </section>
+    <section class="alerts">
+      <article
+        v-for="(status, alert, index) in alerts"
+        :key="index"
+        :class="status"
+      >
+        <p>{{ alert }}</p>
+      </article>
     </section>
     <section
       v-if="hasSearched"

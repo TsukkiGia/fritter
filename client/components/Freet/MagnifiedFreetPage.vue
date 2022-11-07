@@ -7,11 +7,17 @@
       v-if="freet"
       class="freet"
     >
-    <h2>Freet</h2>
-      <FreetComponent
-        :key="freet._id"
-        :freet="freet"
-      />
+      <section>
+        <header>
+          <h2>Freet</h2>
+        </header>
+        <article>
+          <FreetComponent
+            :key="freet._id"
+            :freet="freet"
+          />
+        </article>
+      </section>
       <section class="alerts">
         <article
           v-for="(status, alert, index) in alerts"
@@ -30,7 +36,7 @@
       <section
         v-if="$store.state.currentFreetComments.length"
       >
-      <h1>Comments</h1>
+        <h1>Comments</h1>
         <FreetComponent
           v-for="comment in comments"
           :key="comment.id"
@@ -148,7 +154,6 @@
   
   <style scoped>
   .freet {
-
       padding: 20px;
       position: relative;
       margin: auto;

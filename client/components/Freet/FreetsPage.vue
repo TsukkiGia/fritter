@@ -1,52 +1,48 @@
 <!-- Default page that also displays freets -->
 
 <template>
-  <div>
-    <main class="ha">
+  <main class="mainPage">
+    <section
+      v-if="$store.state.username"
+      class="buffer"
+    >
+      <CreateFreetForm />
+    </section>
+    <section v-else>
+      <header>
+        <h2>Welcome to Fritter!</h2>
+      </header>
+      <article>
+        <h3>
+          <router-link to="/login">
+            Sign in
+          </router-link>
+          to create, edit, and delete freets.
+        </h3>
+      </article>
+    </section>
+    <section>
+      <header class="left">
+        <h2>
+          Your Feed
+        </h2>
+      </header>
       <section
-        v-if="$store.state.username"
-        class="haha"
+        v-if="$store.state.freets.length"
       >
-        <CreateFreetForm />
+        <FreetComponent
+          v-for="freet in $store.state.freets"
+          :key="freet.id"
+          :freet="freet"
+        />
       </section>
-      <section v-else>
-        <header>
-          <h2>Welcome to Fritter!</h2>
-        </header>
-        <article>
-          <h3>
-            <router-link to="/login">
-              Sign in
-            </router-link>
-            to create, edit, and delete freets.
-          </h3>
-        </article>
-      </section>
-      <section>
-        <header>
-          <div class="left">
-            <h2>
-              Your Feed
-            </h2>
-          </div>
-        </header>
-        <section
-          v-if="$store.state.freets.length"
-        >
-          <FreetComponent
-            v-for="freet in $store.state.freets"
-            :key="freet.id"
-            :freet="freet"
-          />
-        </section>
-        <article
-          v-else
-        >
-          <h3>No freets found.</h3>
-        </article>
-      </section>
-    </main>
-  </div>
+      <article
+        v-else
+      >
+        <h3>No freets found.</h3>
+      </article>
+    </section>
+  </main>
 </template>
 
 <script>
@@ -63,12 +59,12 @@ export default {
 </script>
 
 <style scoped>
-.ha {
+.mainPage {
   margin: auto;
   width: 50%;
 }
 
-.haha {
+.buffer {
   margin-top: 30px;
 }
 

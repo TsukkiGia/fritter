@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <article>
     <section v-if="$store.state.username">
       <header>
         <h2>@{{ $store.state.username }}'s New Beginning </h2>
@@ -32,7 +32,7 @@
         </h3>
       </article>
     </section>
-  </main>
+  </article>
 </template>
     
     <script>

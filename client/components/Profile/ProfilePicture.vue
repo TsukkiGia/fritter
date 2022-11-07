@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <section>
     <img 
       v-if="user.profilePictureColor === 'red'"
       src="../../public/1.png"
@@ -28,25 +28,23 @@
       v-if="user.profilePictureColor === 'pink'"
       src="../../public/7.png"
     >
-  </main>
+  </section>
 </template>
     
 <script>
-    export default {
-      name: 'ProfilePicture',
-      props: {
-        user: {
-          type: Object,
-          required: true
-        }
-      },
+  export default {
+    name: 'ProfilePicture',
+    props: {
+      user: {
+        type: Object,
+        required: true
+      }
+    },
 }
 </script>
 <style scoped>
-
-
 img {
   height: 50px;
-  margin: 0;
+  margin-right: 20px;
 }
 </style>

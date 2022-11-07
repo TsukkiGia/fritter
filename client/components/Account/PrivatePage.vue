@@ -2,22 +2,22 @@
 <!-- User should be authenticated in order to see this page -->
 
 <template>
-  <main>
-    <div class="container">
-      <div> Private account</div>
-      <div> 
-        <label class="switch">
-          <input
-            type="checkbox"
-            :checked="user.isPrivate === 'true'"
-            @click="userPrivacy"
-          >
-          <span class="slider round" />
-        </label>
-      </div>
-    </div>
+  <article class="container">
+    <header>
+      Private account
+    </header>
+    <section> 
+      <label class="switch">
+        <input
+          type="checkbox"
+          :checked="user.isPrivate === 'true'"
+          @click="userPrivacy"
+        >
+        <span class="slider round" />
+      </label>
+    </section>
     <p> Making your account private hides your Freets from search and limits your profile to your followers.</p>
-  </main>
+  </article>
 </template>
   
 
@@ -75,8 +75,8 @@
   };
   </script>
 
-  <style scoped>
-  /* Code from https://www.w3schools.com/howto/howto_css_switch.asp */
+<style scoped>
+/* Code from https://www.w3schools.com/howto/howto_css_switch.asp */
 /* The switch - the box around the slider */
 .switch {
   position: relative;
