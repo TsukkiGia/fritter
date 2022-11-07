@@ -4,6 +4,20 @@
       <header>
         <h2>@{{ $store.state.username }}'s Notifications </h2>
       </header>
+      <section
+        v-if="$store.state.freets.length"
+      >
+        <NotificationComponent
+          v-for="freet in $store.state.notifications"
+          :key="freet.id"
+          :notification="freet"
+        />
+      </section>
+      <article
+        v-else
+      >
+        <h3>No notifications found.</h3>
+      </article>
     </section>
     <section v-else>
       <header>
@@ -18,20 +32,6 @@
         </h3>
       </article>
     </section>
-    <section
-      v-if="$store.state.freets.length"
-    >
-      <NotificationComponent
-        v-for="freet in $store.state.notifications"
-        :key="freet.id"
-        :notification="freet"
-      />
-    </section>
-    <article
-      v-else
-    >
-      <h3>No notifications found.</h3>
-    </article>
   </main>
 </template>
 
@@ -70,6 +70,11 @@ export default {
 section {
   display: flex;
   flex-direction: column;
+  
+}
+h2{
+  color: #24b2e1;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 header, header > * {

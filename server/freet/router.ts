@@ -58,6 +58,7 @@ router.get(
     }
 
     const allFreets = await FreetCollection.findAll();
+    const a = await util.refreetsCommentsAndFreets(req.session.userId);
     const response = allFreets.map(util.constructFreetResponse);
     const awaitedResponses = await Promise.all(response);
     res.status(200).json(awaitedResponses);

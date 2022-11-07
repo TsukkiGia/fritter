@@ -16,7 +16,8 @@ const RefreetSchema = new Schema({
   },
   refreetedItem: {
     type: Schema.Types.ObjectId,
-    required: true
+    required: true,
+    ref: 'Freet'
   },
   freetDeleted: {
     type: Boolean,

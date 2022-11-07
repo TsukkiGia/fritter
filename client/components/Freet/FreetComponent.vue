@@ -26,7 +26,7 @@
             >
             <img 
               v-if="freet.profilePictureColor === 'green'"
-              src="../../public/5.png"
+              src="../../public/4.png"
             >
             <img 
               v-if="freet.profilePictureColor === 'blue'"
@@ -177,29 +177,38 @@ export default {
     freet: {
       type: Object,
       required: true
-    },
-    inProfile: {
-      type: Boolean
     }
   },
   data() {
     return {
       editing: false, // Whether or not this freet is in edit mode
-      draft: this.freet.content, // Potentially-new content for this freet
       alerts: {}, // Displays success/error messages encountered during freet modification
-      date: moment(this.freet.dateModified, 'MMMM Do YYYY, h:mm:ss a').toDate(),
-      path: `freet/${this.freet._id}`,
-      userPath: this.inProfile ? `${this.freet.authorId}` : `profile/${this.freet.authorId}`
+
     };
   },
   computed: {
+    date(){
+      return moment(this.freet.dateModified, 'MMMM Do YYYY, h:mm:ss a').toDate();
+    } ,
+    path(){
+      return `/freet/${this.freet._id}`;
+    },
+    userPath(){
+      return `/profile/${this.freet.authorId}`
+    },
+    draft(){
+      return this.freet.content;
+    }, // Potentially-new content for this freet
     liked() {
+      if (this.freet === undefined) return [];
       return this.freet.likers.includes(this.$store.state.userId);
     },
     refreeted() {
+      if (this.freet === undefined) return [];
       return this.freet.refreeters.includes(this.$store.state.userId);
     },
     downvoted() {
+      if (this.freet === undefined) return [];
       return this.freet.downvoters.includes(this.$store.state.userId);
     }
   },
@@ -527,6 +536,5 @@ button {
   padding-right:5px;
   box-shadow: 0px 1px 2px rgb(141, 156, 160);
   font-size: 15px;
-
 }
 </style>

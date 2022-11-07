@@ -11,8 +11,7 @@ export type Follow = {
 const FollowSchema = new Schema({
   followedUser: {
     type: Schema.Types.ObjectId,
-    required: true,
-    ref: 'User'
+    required: true
   },
   follower: {
     type: Schema.Types.ObjectId,

@@ -121,6 +121,10 @@ class FreetCollection {
     return FreetModel.find({authorId: author._id, timeOfDeletion: null, commentPropagation: {$ne: false}}).populate('authorId');
   }
 
+  static async findAllById(userId: string): Promise<Array<HydratedDocument<Freet>>> {
+    return FreetModel.find({authorId: userId, timeOfDeletion: null, commentPropagation: {$ne: false}}).populate('authorId');
+  }
+
   /**
    * Update a freet with the new content
    *

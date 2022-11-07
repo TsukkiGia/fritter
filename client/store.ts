@@ -19,6 +19,7 @@ const store = new Vuex.Store({
     currentFreetComments: [],
     currentFreetId: null,
     deletedFreets: [],
+    currentFollowStatus: null,
     alerts: {} // global success/error messages encountered during submissions to non-visible forms
   },
   mutations: {
@@ -47,6 +48,9 @@ const store = new Vuex.Store({
     },
     setCurrentFreetId(state, freetId){
       state.currentFreetId = freetId
+    },
+    setCurrentFollowStatus(state, status){
+      state.currentFollowStatus = status;
     },
     updateFilter(state, filter) {
       /**

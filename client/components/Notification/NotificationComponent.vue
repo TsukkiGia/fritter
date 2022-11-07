@@ -24,22 +24,27 @@
           src="../../public/follow.png"
         >
       </div>
+      
       <div class="content">
-        <header>
-          <h3 class="author">
-            @{{ notification.notificationSender.username }} {{
-              (notification.notificationType == "like") ? "liked your Freet" : 
-              ((notification.notificationType == "refreet") ? "refreeted your Freet" :
-                ((notification.notificationType == "comment") ? "commented on your Refreet" :
-                  ((notification.notificationType == "follow") ? "followed you" : "requested to follow you"))
-                 
-              )
-            }}
-          </h3>
-        </header>
-        <p class="info">
-          Notification received at {{ notification.notificationTime }}
-        </p>
+        <router-link
+          :to="path"
+          style="text-decoration: none; color: inherit;"
+        >
+          <header>
+            <h3 class="author">
+              @{{ notification.notificationSender.username }} {{
+                (notification.notificationType == "like") ? "liked your Freet" : 
+                ((notification.notificationType == "refreet") ? "refreeted your Freet" :
+                  ((notification.notificationType == "comment") ? "commented on your Freet" :
+                    ((notification.notificationType == "follow") ? "followed you" : "requested to follow you"))   
+                )
+              }}
+            </h3> 
+          </header>
+          <p class="info">
+            Notification received at {{ notification.notificationTime }}
+          </p>
+        </router-link>
         <section class="alerts">
           <article
             v-for="(status, alert, index) in alerts"
@@ -50,6 +55,7 @@
           </article>
         </section>
       </div>
+      
       <div 
         v-if="notification.hasAcceptedFollowRequest == 'received'"
         class="follow-request"
@@ -95,7 +101,10 @@
       };
     },
     computed: {
-
+      path(){
+        if (this.notification.notificationType === 'follow' || this.notification.notificationType ==='followrequest') return "/profile/"+this.notification.notificationSender._id;
+        return "/freet/"+this.notification.notificationFreet;
+      }
     },
     methods: {
       async request(params) {
@@ -168,9 +177,14 @@
   
   <style scoped>
   .notification {
-      border: 1px solid #111;
-      padding: 20px;
-      position: relative;
+    box-shadow: 0px 2px 5px rgb(141, 156, 160);
+    padding: 15px;
+    position: relative;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background-color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13pt;
   }
 .icon {
 	flex: 1;
