@@ -2,39 +2,43 @@
 <!-- We've tagged some elements with classes; consider writing CSS using those classes to style them... -->
 
 <template>
-  <article
-    v-if="freet"
-    class="freet"
-  >
-    <FreetComponent
-      :key="freet._id"
-      :freet="freet"
-    />
-    <section class="alerts">
-      <article
-        v-for="(status, alert, index) in alerts"
-        :key="index"
-        :class="status"
-      >
-        <p>{{ alert }}</p>
-      </article>
-    </section>
-    <section>
-      <CreateCommentForm 
-        :key="freet.id"
+  <main class="ha">
+    <article
+      v-if="freet"
+      class="freet"
+    >
+    <h2>Freet</h2>
+      <FreetComponent
+        :key="freet._id"
         :freet="freet"
       />
-    </section>
-    <section
-      v-if="$store.state.currentFreetComments.length"
-    >
-      <FreetComponent
-        v-for="comment in comments"
-        :key="comment.id"
-        :freet="comment"
-      />
-    </section>
-  </article>
+      <section class="alerts">
+        <article
+          v-for="(status, alert, index) in alerts"
+          :key="index"
+          :class="status"
+        >
+          <p>{{ alert }}</p>
+        </article>
+      </section>
+      <section class="comment">
+        <CreateCommentForm 
+          :key="freet.id"
+          :freet="freet"
+        />
+      </section>
+      <section
+        v-if="$store.state.currentFreetComments.length"
+      >
+      <h1>Comments</h1>
+        <FreetComponent
+          v-for="comment in comments"
+          :key="comment.id"
+          :freet="comment"
+        />
+      </section>
+    </article>
+  </main>
 </template>
   
   <script>
@@ -144,10 +148,24 @@
   
   <style scoped>
   .freet {
-    width:100%;
+
       padding: 20px;
       position: relative;
       margin: auto;
+  }
+  .ha {
+    width: 75%;
+    margin: auto;
+  }
+
+  .comment {
+    margin-top: 30px;
+    margin-bottom: 0px;
+  }
+
+  h1,h2 {
+    color: #24b2e1;
+  font-family: Arial, Helvetica, sans-serif;
   }
 
   </style>

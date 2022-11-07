@@ -4,7 +4,7 @@
 <template>
   <main>
     <div class="container">
-      <div> Make your account private</div>
+      <div> Private account</div>
       <div> 
         <label class="switch">
           <input
