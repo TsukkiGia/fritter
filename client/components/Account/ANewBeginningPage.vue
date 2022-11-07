@@ -4,6 +4,20 @@
       <header>
         <h2>@{{ $store.state.username }}'s New Beginning </h2>
       </header>
+      <section>
+        <h1>Delete all freets before this date</h1>
+        <form @submit.prevent="submit">
+          <input
+            v-model="deadlineDate"
+            type="date"
+            class="datePicker"
+          >
+          <input
+            class="submitter"
+            type="submit"
+          >
+        </form>
+      </section>
     </section>
     <section v-else>
       <header>
@@ -17,16 +31,6 @@
           to view a new beginning.
         </h3>
       </article>
-    </section>
-    <section>
-      <h2>Delete all freets before this date</h2>
-      <form @submit.prevent="submit">
-        <input
-          v-model="deadlineDate"
-          type="date"
-        >
-        <input type="submit">
-      </form>
     </section>
   </main>
 </template>
@@ -54,7 +58,7 @@
                     if (!r.ok) {
                         throw new Error(res.error);
                     }
-            
+                    alert("You have successfully deleted your Freets before "+ this.deadlineDate);
                     } catch (e) {
                     
         
@@ -68,24 +72,26 @@
     </script>
     
     <style scoped>
-    section {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    header, header > * {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    button {
-        margin-right: 10px;
-    }
-    
-    section .scrollbox {
-      flex: 1 0 50vh;
-      padding: 3%;
-      overflow-y: scroll;
-    }
+  h1 {
+    color: #24b2e1;
+  font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .datePicker {
+
+    font-size: 20px;
+    width:50%;
+  }
+  .submitter {
+    background-color: #24b2e1;
+  color: white;
+  border: 2px solid #24b2e1; 
+  border-radius: 5px;
+  padding-left:5px;
+  padding-right:5px;
+  box-shadow: 0px 1px 2px rgb(141, 156, 160);
+  font-size: 20px;
+  margin-left: 50px;
+  }
+  
     </style>
