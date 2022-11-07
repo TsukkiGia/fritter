@@ -134,10 +134,10 @@ class FreetCollection {
    */
   static async updateOne(freetId: Types.ObjectId | string, content: string, toDelete: string, viewerId: string): Promise<HydratedDocument<Freet>> {
     const freet = await FreetModel.findOne({_id: freetId});
-    freet.dateModified = new Date();
 
     if (content) {
       freet.content = content;
+      freet.dateModified = new Date();
     }
 
     if (viewerId) {
@@ -150,8 +150,10 @@ class FreetCollection {
 
     if (toDelete === 'true') {
       freet.timeOfDeletion = new Date();
+      freet.dateModified = new Date();
     } else if (toDelete === 'false') {
       freet.timeOfDeletion = null;
+      freet.dateModified = new Date();
     }
 
     await freet.save();

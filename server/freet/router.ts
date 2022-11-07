@@ -235,7 +235,7 @@ router.put(
     freetValidator.doesFreetExistGeneralDelete
   ],
   async (req: Request, res: Response, next: NextFunction) => {
-    if (req.body.content !== '' || req.body.toDelete !== '' || req.session.userId !== '') {
+    if (req.body.content !== undefined || req.body.toDelete !== undefined) {
       next();
       return;
     }
