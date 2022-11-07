@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable no-await-in-loop */
+
 import type {Types, HydratedDocument} from 'mongoose';
 import moment from 'moment';
 import type {Freet, PopulatedFreet} from '../freet/model';
@@ -7,6 +8,7 @@ import UserCollection from '../user/collection';
 import LikeCollection from '../like/collection';
 import RefreetCollection from '../refreet/collection';
 import DownvoteCollection from '../downvote/collection';
+import HiddenFreetCollection from '../hiddenfreets/collection';
 import FollowCollection from '../follow/collection';
 import FreetCollection from './collection';
 
@@ -23,6 +25,7 @@ type FreetResponse = {
   timeOfDeletion: string;
   parentFreet: string;
   isRefreet: string;
+  refreeter: string;
   viewers: string[];
   commentPropagation: string;
   likers: string[];
@@ -42,28 +45,12 @@ function isRefreet(item: Refreet | Freet): item is Refreet {
   return (item as Refreet).refreetedItem !== undefined;
 }
 
-async function refreetsCommentsAndFreets(userId: string): Promise<FreetResponse[]> {
-  const followingList = await FollowCollection.getFollowingList(userId);
-  const freets = [];
-  const freetsToAwait = [];
-  for (const following of followingList) {
-    const followedUser = following.followedUser.toString();
-    freetsToAwait.push(FreetCollection.findAllById(followedUser));
-    freetsToAwait.push(RefreetCollection.findRefreetsByRefreeter(followedUser));
-  }
-
-  const awaitedFreets = await Promise.all(freetsToAwait);
-  for (const freetList of awaitedFreets) {
-    freets.push(...freetList);
-  }
-
-  freets.sort((first, second) => {
-    const firstDate: Date = first.dateCreated;
-    const secondDate: Date = second.dateCreated;
-    return firstDate.getTime() - secondDate.getTime();
-  });
-
-  const newFreets = freets.map(async freetItem => {
+async function allFreetsByOnePerson(userId: string): Promise<FreetResponse[]> {
+  const freets = await FreetCollection.findAllById(userId);
+  const refreets = await RefreetCollection.findRefreetsByRefreeter(userId);
+  const both = [...freets, ...refreets];
+  const allFreetResponses = [];
+  for (const freetItem of both) {
     const freet: Freet = isRefreet(freetItem) ? await FreetCollection.findOne(freetItem.refreetedItem) : freetItem;
     const user = await UserCollection.findOneByUserId(freet.authorId);
     const freetCopy: PopulatedFreet = {
@@ -89,26 +76,57 @@ async function refreetsCommentsAndFreets(userId: string): Promise<FreetResponse[
     }
 
     const {username, displayName, profilePictureColor, _id} = freetCopy.authorId;
-    return {
-      ...freet,
+    allFreetResponses.push({
       _id: freet._id.toString(),
       author: username,
       displayName,
+      content: freet.content,
       authorId: _id.toString(),
       profilePictureColor,
-      dateCreated: formatDate(freet.dateCreated),
+      dateCreated: isRefreet(freetItem) ? formatDate(freetItem.dateCreated) : formatDate(freet.dateCreated),
       dateModified: formatDate(freet.dateModified),
       timeOfDeletion: (freet.timeOfDeletion === null || freet.timeOfDeletion === undefined) ? '' : formatDate(freet.timeOfDeletion),
       parentFreet: (freet.parentFreet === null || freet.parentFreet === undefined) ? '' : freet.parentFreet.toString(),
       isRefreet: isRefreet(freetItem) ? 'true' : 'false',
+      refreeter: isRefreet(freetItem) ? user.username : '',
       viewers: freet.viewers,
       commentPropagation: (freet.commentPropagation === null || freet.commentPropagation === undefined) ? '' : freet.commentPropagation.toString(),
       likers: niceLikers,
       refreeters: niceRefreeters,
       downvoters: niceDownvoters
-    };
+    });
+  }
+
+  allFreetResponses.sort((first, second) => {
+    const firstDate: Date = moment(first.dateCreated, 'MMMM Do YYYY, h:mm:ss a').toDate();
+    const secondDate: Date = moment(second.dateCreated, 'MMMM Do YYYY, h:mm:ss a').toDate();
+    return secondDate.getTime() - firstDate.getTime();
   });
-  return Promise.all(newFreets);
+
+  return allFreetResponses;
+}
+
+async function refreetsCommentsAndFreets(userId: string): Promise<FreetResponse[]> {
+  const followingList = await FollowCollection.getFollowingList(userId);
+  const freetsToAwait = [];
+  for (const following of followingList) {
+    const followedUser = following.followedUser.toString();
+    freetsToAwait.push(allFreetsByOnePerson(followedUser));
+  }
+
+  const allFreetResponses = [];
+  const awaitedFreets = await Promise.all(freetsToAwait);
+  for (const awaitedFreet of awaitedFreets) {
+    allFreetResponses.push(...awaitedFreet);
+  }
+
+  allFreetResponses.sort((first, second) => {
+    const firstDate: Date = moment(first.dateCreated, 'MMMM Do YYYY, h:mm:ss a').toDate();
+    const secondDate: Date = moment(second.dateCreated, 'MMMM Do YYYY, h:mm:ss a').toDate();
+    return secondDate.getTime() - firstDate.getTime();
+  });
+
+  return allFreetResponses;
 }
 
 async function hideFreetsFromPrivateUsers(freets: Freet[]): Promise<Freet[]> {
@@ -132,6 +150,16 @@ async function hideFreetsFromPrivateUsers(freets: Freet[]): Promise<Freet[]> {
   }
 
   return filtered_freets;
+}
+
+async function removeHiddenFreets(freets: Freet[], userId: string): Promise<Freet[]> {
+  const hiddenFreets = await HiddenFreetCollection.findHiddenFreetsForUser(userId);
+  const hidden = new Set();
+  for (const hiddenFreet of hiddenFreets) {
+    hidden.add(hiddenFreet.hiddenItem.toString());
+  }
+
+  return freets.filter(freet => !hidden.has(freet._id.toString()));
 }
 
 /**
@@ -180,6 +208,7 @@ const constructFreetResponse = async (freet: HydratedDocument<Freet>): Promise<F
     timeOfDeletion: (freet.timeOfDeletion === null || freet.timeOfDeletion === undefined) ? '' : formatDate(freet.timeOfDeletion),
     parentFreet: (freetCopy.parentFreet === null || freetCopy.parentFreet === undefined) ? '' : freetCopy.parentFreet.toString(),
     isRefreet: 'false',
+    refreeter: '',
     viewers: freetCopy.viewers,
     commentPropagation: (freetCopy.commentPropagation === null || freetCopy.commentPropagation === undefined) ? '' : freetCopy.commentPropagation.toString(),
     likers: niceLikers,
@@ -191,5 +220,7 @@ const constructFreetResponse = async (freet: HydratedDocument<Freet>): Promise<F
 export {
   constructFreetResponse,
   hideFreetsFromPrivateUsers,
-  refreetsCommentsAndFreets
+  refreetsCommentsAndFreets,
+  allFreetsByOnePerson,
+  removeHiddenFreets
 };

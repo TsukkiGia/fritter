@@ -28,7 +28,6 @@ methods: {
     async submit() {
         if (this.deadlineDate !== ""){
             let [y, m, d] = this.deadlineDate.split('-');
-            console.log(this.deadlineDate);
             const fields = {deadlineYear: y, deadlineMonth: m, deadlineDay: d};
             const options = {method: "PUT", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(fields)};
             const url = `/api/freets`;

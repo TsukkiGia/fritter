@@ -57,8 +57,7 @@ router.get(
       return;
     }
 
-    const allFreets = await FreetCollection.findAll();
-    const a = await util.refreetsCommentsAndFreets(req.session.userId);
+    const allFreets = await util.removeHiddenFreets(await FreetCollection.findAll(), req.session.userId);
     const response = allFreets.map(util.constructFreetResponse);
     const awaitedResponses = await Promise.all(response);
     res.status(200).json(awaitedResponses);
@@ -96,10 +95,8 @@ router.get(
       return;
     }
 
-    const authorFreets = await FreetCollection.findAllByUsername(req.query.author as string);
-    const response = authorFreets.map(util.constructFreetResponse);
-    const awaitedResponses = await Promise.all(response);
-    res.status(200).json(awaitedResponses);
+    const authorFreets = await util.allFreetsByOnePerson(user._id.toString());
+    res.status(200).json(authorFreets);
   }
 );
 

@@ -38,6 +38,7 @@
       <section v-if="($store.state.userId === $route.params.id) || (user.isPrivate === 'false') || (user.isPrivate === 'true' && $store.state.currentFollowStatus === 'yes')">
         <FreetComponent
           v-for="freet in $store.state.profileFreets"
+          @refresh="fetchUser"
           :key="freet.id"
           :freet="freet"
           :in-profile="true"

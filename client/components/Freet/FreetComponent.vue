@@ -5,6 +5,12 @@
   <article
     class="freet"
   >
+    <section
+      v-if="freet.isRefreet === 'true'"
+      class="refreet"
+    >
+      @{{ freet.refreeter }} Refreeted
+    </section>
     <section class="container">
       <router-link
         :to="userPath"
@@ -131,6 +137,13 @@
             ⬇️ Remove downvote
           </button>
         </span>
+        <span v-if="$route.name === 'Home'">
+          <button
+            @click="hideFreet"
+          > 
+            🙈 Hide
+          </button>
+        </span>
       </span>
     </section>
 
@@ -167,7 +180,7 @@ export default {
   },
   computed: {
     date(){
-      return moment(this.freet.dateModified, 'MMMM Do YYYY, h:mm:ss a').toDate();
+      return moment(this.freet.dateCreated, 'MMMM Do YYYY, h:mm:ss a').toDate();
     } ,
     path(){
       return `/freet/${this.freet._id}`;
@@ -465,7 +478,22 @@ export default {
         setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
       }
+    },
+    async hideFreet(){
+      try {
+        const fields = {freetId: this.freet._id};
+        const r = await  fetch('/api/hiddenfreets', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
+        }
+        this.$store.commit('refreshFreets');  
     }
+    catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+  }
   }
 };
 </script>
@@ -481,6 +509,13 @@ export default {
   font-size:10pt;
   color: #898b8c;
   font-family: Arial, Helvetica, sans-serif
+}
+
+.refreet {
+  font-size:10pt;
+  color: #898b8c;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-left: 70px;
 }
 .freet {
     box-shadow: 0px 2px 5px rgb(141, 156, 160);
