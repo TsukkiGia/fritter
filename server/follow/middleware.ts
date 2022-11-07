@@ -7,9 +7,7 @@ const isCurrentUserFollowing = async (req: Request, res: Response, next: NextFun
   const follow = await FollowCollection.findFollowRecord(req.session.userId, req.query.followedUser as string);
   if (!follow) {
     res.status(400).json({
-      error: {
-        followNotFound: `Current user has not followed user with ID ${req.query.followedUser as string}`
-      }
+      error: `Current user has not followed user with ID ${req.query.followedUser as string}`
     });
     return;
   }
@@ -22,9 +20,7 @@ const isCurrentUserNotFollowing = async (req: Request, res: Response, next: Next
   if (follow) {
     const message = follow.hasAcceptedFollowRequest ? `Current user has already made a request to followed user with ID ${req.body.followedUser as string}` : `Current user has already followed user with ID ${req.body.followedUser as string}`;
     res.status(400).json({
-      error: {
-        followAlreadyExists: message
-      }
+      error: message
     });
     return;
   }

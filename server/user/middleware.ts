@@ -14,9 +14,7 @@ const isCurrentSessionUserExists = async (req: Request, res: Response, next: Nex
     if (!user) {
       req.session.userId = undefined;
       res.status(500).json({
-        error: {
-          userNotFound: 'User session was not recognized.'
-        }
+        error: 'User session was not recognized.'
       });
       return;
     }
@@ -33,9 +31,7 @@ const isValidUsername = (req: Request, res: Response, next: NextFunction) => {
     const usernameRegex = /^\w+$/i;
     if (!usernameRegex.test(req.body.username ?? (req.query.username as string))) {
       res.status(400).json({
-        error: {
-          username: 'Username must be a nonempty alphanumeric string.'
-        }
+        error: 'Username must be a nonempty alphanumeric string.'
       });
       return;
     }
@@ -48,9 +44,7 @@ const isValidDisplayName = (req: Request, res: Response, next: NextFunction) => 
   const displaynameRegex = /^(\w+(\s?))+$/i;
   if (!displaynameRegex.test(req.body.displayName)) {
     res.status(400).json({
-      error: {
-        displayName: 'Display Name must be a nonempty alphanumeric string.'
-      }
+      error: 'Display Name must be a nonempty alphanumeric string.'
     });
     return;
   }
@@ -66,9 +60,7 @@ const isValidPassword = (req: Request, res: Response, next: NextFunction) => {
     const passwordRegex = /^\S+$/;
     if (!passwordRegex.test(req.body.password)) {
       res.status(400).json({
-        error: {
-          password: 'Password must be a nonempty string.'
-        }
+        error: 'Password must be a nonempty string.'
       });
       return;
     }
@@ -81,9 +73,7 @@ const isValidPrivacySetting = async (req: Request, res: Response, next: NextFunc
   if (req.body.isPrivate) {
     if (req.body.isPrivate !== 'true' && req.body.isPrivate !== 'false') {
       res.status(400).json({
-        error: {
-          password: 'isPrivate must be true or false.'
-        }
+        error: 'isPrivate must be true or false.'
       });
       return;
     }
@@ -91,18 +81,14 @@ const isValidPrivacySetting = async (req: Request, res: Response, next: NextFunc
     const user = await UserCollection.findOneByUserId(req.session.userId);
     if (user.isPrivate && req.body.isPrivate === 'true') {
       res.status(400).json({
-        error: {
-          isPrivate: 'Current user is already private.'
-        }
+        error: 'Current user is already private.'
       });
       return;
     }
 
     if (!user.isPrivate && req.body.isPrivate === 'false') {
       res.status(400).json({
-        error: {
-          isPrivate: 'Current user is already public.'
-        }
+        error: 'Current user is already public.'
       });
       return;
     }
@@ -148,10 +134,10 @@ const isUsernameNotAlreadyInUse = async (req: Request, res: Response, next: Next
     }
 
     res.status(409).json({
-      error: {
-        username: 'An account with this username already exists.'
-      }
+      error:
+        'An account with this username already exists.'
     });
+    return;
   }
 
   next();
@@ -163,9 +149,7 @@ const isUsernameNotAlreadyInUse = async (req: Request, res: Response, next: Next
 const isUserLoggedIn = (req: Request, res: Response, next: NextFunction) => {
   if (!req.session.userId) {
     res.status(403).json({
-      error: {
-        auth: 'You must be logged in to complete this action.'
-      }
+      error: 'You must be logged in to complete this action.'
     });
     return;
   }

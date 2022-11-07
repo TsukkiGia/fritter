@@ -9,9 +9,7 @@ const doesLikeExist = async (req: Request, res: Response, next: NextFunction) =>
   const like = await LikeCollection.findLike(req.session.userId, req.query.freetId as string);
   if (!like) {
     res.status(400).json({
-      error: {
-        likeNotFound: `Current user has not liked Freet with freet ID ${req.query.freetId as string}`
-      }
+      error: `Current user has not liked Freet with freet ID ${req.query.freetId as string}`
     });
     return;
   }
@@ -26,9 +24,7 @@ const doesLikeNotExist = async (req: Request, res: Response, next: NextFunction)
   const like = await LikeCollection.findLike(req.session.userId, req.body.freetId);
   if (like) {
     res.status(400).json({
-      error: {
-        likeNotFound: `Current user has already liked Freet with freet ID ${req.body.freetId as string}`
-      }
+      error: `Current user has already liked Freet with freet ID ${req.body.freetId as string}`
     });
     return;
   }
