@@ -144,7 +144,7 @@ async function hideFreetsFromPrivateUsers(freets: Freet[]): Promise<Freet[]> {
   }
 
   for (const freet of freets) {
-    if (!userToPrivate.get(freet.authorId.toString())) {
+    if (!userToPrivate.get(freet.authorId._id.toString())) {
       filtered_freets.push(freet);
     }
   }
