@@ -33,6 +33,7 @@
         <span :class="{selected: $route.name === 'Notifications'}">Notifications </span>
       </router-link>
       <router-link
+      v-if="$store.state.username"
         to="/search"
       >
         <span :class="{selected: $route.name === 'Search'}">Search </span>

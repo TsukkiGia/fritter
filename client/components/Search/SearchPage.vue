@@ -2,7 +2,7 @@
 
 <template>
   <main>
-    <section>
+    <section v-if="$store.state.username">
       <header>
         <h2>
           Search
@@ -71,6 +71,19 @@
       <h2 v-if="$store.state.searchResults.length === 0">
         No Users Found!
       </h2>
+    </section>
+    <section v-else>
+      <header>
+        <h2>Welcome to Fritter!</h2>
+      </header>
+      <article>
+        <h3>
+          <router-link to="/login">
+            Sign in
+          </router-link>
+          to search.
+        </h3>
+      </article>
     </section>
   </main>
 </template>
@@ -141,6 +154,9 @@
   font-family: Arial, Helvetica, sans-serif;
   margin-bottom: 0;
 }  
+h3 {
+  font-family: Arial, Helvetica, sans-serif;
+}
   button {
       margin-right: 10px;
       width: 10%;

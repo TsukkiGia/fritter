@@ -92,4 +92,7 @@ section .scrollbox {
   padding: 3%;
   overflow-y: scroll;
 }
+h3 {
+  font-family: Arial, Helvetica, sans-serif;
+}
 </style>
