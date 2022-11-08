@@ -2,11 +2,11 @@
 <!-- User should be authenticated in order to see this page -->
 
 <template>
-  <article class="container">
-    <header>
-      Private account
-    </header>
-    <section> 
+  <article>
+    <article class="container">
+      <header>
+        Private account
+      </header>
       <label class="switch">
         <input
           type="checkbox"
@@ -15,7 +15,7 @@
         >
         <span class="slider round" />
       </label>
-    </section>
+    </article>
     <p> Making your account private hides your Freets from search and limits your profile to your followers.</p>
   </article>
 </template>
@@ -27,7 +27,8 @@
     name: 'PrivatePage',
     data() {
         return {
-            user: {isPrivate: 'false'}
+            user: {isPrivate: 'false'},
+            alerts: {}
         }
     },
     mounted(){

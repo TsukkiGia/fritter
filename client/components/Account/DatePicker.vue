@@ -12,6 +12,15 @@
         type="submit"
       >
     </form>
+    <section class="alerts">
+      <article
+        v-for="(status, alert, index) in alerts"
+        :key="index"
+        :class="status"
+      >
+        <p>{{ alert }}</p>
+      </article>
+    </section>
   </section>
 </template>
       
@@ -21,7 +30,8 @@ export default {
 name: 'DatePicker',
 data() {
     return {
-        deadlineDate: ""
+        deadlineDate: "",
+        alerts: {}
     }
 },
 methods: {
