@@ -2,76 +2,80 @@
 
 <template>
   <main>
-    <section v-if="$store.state.username">
-      <header>
-        <h2>
-          Search
-        </h2>
-        <section class="alerts">
-          <article
-            v-for="(status, alert, index) in alerts"
-            :key="index"
-            :class="status"
-          >
-            <p>{{ alert }}</p>
-          </article>
-        </section>
-      </header>
+    <article
+      v-if="$store.state.username"
+    >
+      <section>
+        <header>
+          <h2>
+            Search
+          </h2>
+          <section class="alerts">
+            <article
+              v-for="(status, alert, index) in alerts"
+              :key="index"
+              :class="status"
+            >
+              <p>{{ alert }}</p>
+            </article>
+          </section>
+        </header>
       
-      <form @submit.prevent="submit">
-        <input
-          v-model="value"
-          type="text"
-          placeholder="Search Query"
+        <form @submit.prevent="submit">
+          <input
+            v-model="value"
+            type="text"
+            placeholder="Search Query"
+          >
+          <button 
+            type="submit"
+          >
+            Search
+          </button>
+        </form>
+      </section>
+      <section
+        v-if="hasSearched"
+        class="results"
+      >
+        <button
+          :class="{notSelected: !isFreetResult}"
+          @click="freetResult"
         >
-        <button 
-          type="submit"
-        >
-          Search
+          Freets
         </button>
-      </form>
-    </section>
-    <section
-      v-if="hasSearched"
-      class="results"
-    >
-      <button
-        :class="{notSelected: !isFreetResult}"
-        @click="freetResult"
+        <button
+          :class="{notSelected: isFreetResult}"
+          @click="userResult"
+        >
+          Users
+        </button>
+      </section>
+      <section
+        v-if="hasSearched && isFreetResult"
       >
-        Freets
-      </button>
-      <button
-        :class="{notSelected: isFreetResult}"
-        @click="userResult"
+        <FreetComponent
+          v-for="freet in $store.state.searchResults"
+          :key="freet.id"
+          :freet="freet"
+        /> 
+        <h2 v-if="$store.state.searchResults.length === 0">
+          No Freets Found!
+        </h2>
+      </section>
+      <section
+        v-if="hasSearched && !isFreetResult"
       >
-        Users
-      </button>
-    </section>
-    <section
-      v-if="hasSearched && isFreetResult"
-    >
-      <FreetComponent
-        v-for="freet in $store.state.searchResults"
-        :key="freet.id"
-        :freet="freet"
-      /> 
-      <h2 v-if="$store.state.searchResults.length === 0">
-        No Freets Found!
-      </h2>
-    </section>
-    <section
-      v-if="hasSearched && !isFreetResult"
-    >
-      <UserComponent
-        v-for="user in $store.state.searchResults"
-        :key="user.id"
-        :user="user"
-      />
-      <h2 v-if="$store.state.searchResults.length === 0">
-        No Users Found!
-      </h2>
-    </section>
+        <UserComponent
+          v-for="user in $store.state.searchResults"
+          :key="user.id"
+          :user="user"
+        />
+        <h2 v-if="$store.state.searchResults.length === 0">
+          No Users Found!
+        </h2>
+      </section>
+    </article>
     <section v-else>
       <header>
         <h2>Welcome to Fritter!</h2>

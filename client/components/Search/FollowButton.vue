@@ -41,7 +41,7 @@
       },
       methods: {
         async addFollowNotification(){
-        const notificationReceiver = this.$route.params.id;
+        const notificationReceiver =  this.user._id;
         const fields = {notificationReceiver, notificationType: this.user.isPrivate === 'true'? "followrequest" : "follow" };
         try {
             const r = await fetch('/api/notifications', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
@@ -60,7 +60,7 @@
           }
     },
     async deleteFollowNotification(){
-        const notificationReceiver = this.$route.params.id;
+        const notificationReceiver =  this.user._id;
         const fields = {notificationReceiver, notificationType: "follow" };
         try {
             const r = await fetch('/api/notifications', {method: 'DELETE', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
@@ -82,7 +82,7 @@
         // unfollow
         if (this.followStatus === "yes" || this.followStatus === "requested"){
           const options = {method: "DELETE", headers: {'Content-Type': 'application/json'}};
-          const url = `/api/follows?followedUser=${this.$route.params.id}`;
+          const url = `/api/follows?followedUser=${ this.user._id}`;
           try {
             const r = await fetch(url, options);
             const res = await r.json();
@@ -96,7 +96,7 @@
                 setTimeout(() => this.$delete(this.alerts, e), 3000);
             }
         } else {
-          const fields = {followedUser: this.$route.params.id}
+          const fields = {followedUser:  this.user._id}
           const options = {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(fields)};
           const url = `/api/follows`;
           try {
@@ -115,7 +115,7 @@
 
       },
       getFollowStatus(followingList){
-        const userId = this.$route.params.id;
+        const userId = this.user._id;
         const ids = followingList.map(userObj => {
           return userObj.followedUser;
         });
@@ -145,7 +145,7 @@
           }
           
           this.followStatus = this.getFollowStatus(res);
-          if (this.inProfile){
+          if (this.$route.name === "Profile"){
             this.$store.commit("setCurrentFollowStatus", this.followStatus);
           }
         } catch (e) {

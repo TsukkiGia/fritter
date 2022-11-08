@@ -10,7 +10,7 @@
       <section>
         <header class="left">
           <h2>
-            Your Feed
+            All Freets
           </h2>
         </header>
         <section
