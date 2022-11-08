@@ -13,6 +13,15 @@
           :freet="freet"
           @refresh="fetchDeletedFreets"
         />
+        <section class="alerts">
+          <article
+            v-for="(status, alert, index) in alerts"
+            :key="index"
+            :class="status"
+          >
+            <p>{{ alert }}</p>
+          </article>
+        </section>
       </section>
       <article
         v-else
@@ -42,6 +51,11 @@
   export default {
     name: 'FreetBinPage',
     components: {FreetComponent},
+    data(){
+      return {
+        alerts: {}
+      }
+    },
     mounted() {
           this.fetchDeletedFreets();
     },
@@ -54,11 +68,8 @@
           if (!r.ok) {
             throw new Error(res.error);
           }
-  
           this.$store.commit('updateDeletedFreets', res);
         } catch (e) {
-          
-  
           this.$set(this.alerts, e, 'error');
           setTimeout(() => this.$delete(this.alerts, e), 3000);
         }

@@ -30,7 +30,10 @@
         </article>
       </section>
     </section>
-    <section v-else>
+    <section
+      v-else
+      class="welcome"
+    >
       <header>
         <h2>Welcome to Fritter!</h2>
       </header>
@@ -95,9 +98,13 @@ section .scrollbox {
   overflow-y: scroll;
 }
 
-.welcome {
+.welcome h2 {
   color: #24b2e1;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 25pt;
+}
+
+.welcome h3 {
+  font-family: Arial, Helvetica, sans-serif;
 }
 </style>

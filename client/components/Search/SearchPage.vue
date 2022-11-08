@@ -7,7 +7,17 @@
         <h2>
           Search
         </h2>
+        <section class="alerts">
+          <article
+            v-for="(status, alert, index) in alerts"
+            :key="index"
+            :class="status"
+          >
+            <p>{{ alert }}</p>
+          </article>
+        </section>
       </header>
+      
       <form @submit.prevent="submit">
         <input
           v-model="value"
@@ -20,15 +30,6 @@
           Search
         </button>
       </form>
-    </section>
-    <section class="alerts">
-      <article
-        v-for="(status, alert, index) in alerts"
-        :key="index"
-        :class="status"
-      >
-        <p>{{ alert }}</p>
-      </article>
     </section>
     <section
       v-if="hasSearched"
@@ -54,7 +55,7 @@
         v-for="freet in $store.state.searchResults"
         :key="freet.id"
         :freet="freet"
-      />
+      /> 
       <h2 v-if="$store.state.searchResults.length === 0">
         No Freets Found!
       </h2>
@@ -83,6 +84,9 @@
     components: {FreetComponent, UserComponent},
     data() {
     return {value: '', alerts: {}, isFreetResult: true, hasSearched: false};
+  },
+  mounted(){
+    this.$store.commit('updateSearchResults', []);
   },
   methods: {
     async freetResult(){
