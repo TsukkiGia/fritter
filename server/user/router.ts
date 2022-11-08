@@ -133,6 +133,7 @@ router.put(
   [
     userValidator.isUserLoggedIn,
     userValidator.isValidUsername,
+    userValidator.isValidDisplayName,
     userValidator.isUsernameNotAlreadyInUse,
     userValidator.isValidPassword,
     userValidator.isValidPrivacySetting

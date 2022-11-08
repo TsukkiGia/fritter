@@ -16,7 +16,7 @@ export default {
       ],
       title: 'Change display name',
       callback: () => {
-        const message = 'Successfully changed password!';
+        const message = 'Successfully changed display name!';
         this.$set(this.alerts, message, 'success');
         setTimeout(() => this.$delete(this.alerts, message), 3000);
       }

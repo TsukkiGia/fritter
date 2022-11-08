@@ -27,6 +27,13 @@ const isCurrentSessionUserExists = async (req: Request, res: Response, next: Nex
  * Checks if a username in req.body is valid, that is, it matches the username regex
  */
 const isValidUsername = (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.username === '') {
+    res.status(400).json({
+      error: 'Username must be nonempty'
+    });
+    return;
+  }
+
   if (req.body.username ?? (req.query.username as string)) {
     const usernameRegex = /^\w+$/i;
     if (!usernameRegex.test(req.body.username ?? (req.query.username as string))) {
@@ -41,12 +48,21 @@ const isValidUsername = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const isValidDisplayName = (req: Request, res: Response, next: NextFunction) => {
-  const displaynameRegex = /^(\w+(\s?))+$/i;
-  if (!displaynameRegex.test(req.body.displayName)) {
+  if (req.body.displayName === '') {
     res.status(400).json({
-      error: 'Display Name must be a nonempty alphanumeric string.'
+      error: 'Display name must be nonempty'
     });
     return;
+  }
+
+  if (req.body.displayName) {
+    const displaynameRegex = /^(\w+(\s?))+$/i;
+    if (!displaynameRegex.test(req.body.displayName)) {
+      res.status(400).json({
+        error: 'Display Name must be a nonempty alphanumeric string.'
+      });
+      return;
+    }
   }
 
   next();
@@ -56,6 +72,13 @@ const isValidDisplayName = (req: Request, res: Response, next: NextFunction) => 
  * Checks if a password in req.body is valid, that is, at 6-50 characters long without any spaces
  */
 const isValidPassword = (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.password === '') {
+    res.status(400).json({
+      error: 'Password must be nonempty'
+    });
+    return;
+  }
+
   if (req.body.password) {
     const passwordRegex = /^\S+$/;
     if (!passwordRegex.test(req.body.password)) {
