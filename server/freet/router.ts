@@ -95,10 +95,9 @@ router.get(
       return;
     }
 
-    // const authorFreets = await util.allFreetsByOnePerson(user._id.toString());
-    
-    const authorFreets = await FreetCollection.findAllByUsername(user.username);
-    const final = await Promise.all(authorFreets.map(util.constructFreetResponse));
+    const final = await util.allFreetsByOnePerson(user._id.toString());
+    // const authorFreets = await FreetCollection.findAllByUsername(user.username);
+    // const final = await Promise.all(authorFreets.map(util.constructFreetResponse));
     res.status(200).json(final);
   }
 );
