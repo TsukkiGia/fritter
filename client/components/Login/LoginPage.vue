@@ -3,13 +3,13 @@
 
 <template>
   <main>
-    <section>
+    <section class="centered">
       <header>
         <h2>New to Fritter?</h2>
       </header>
       <RegisterForm />
     </section>
-    <section>
+    <section class="centered">
       <header>
         <h2>Have an account?</h2>
       </header>
@@ -30,3 +30,14 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+h2{
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.centered {
+  margin: auto;
+  width: 50%;
+}
+</style>
