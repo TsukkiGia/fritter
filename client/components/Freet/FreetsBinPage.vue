@@ -11,6 +11,7 @@
           v-for="freet in $store.state.deletedFreets"
           :key="freet.id"
           :freet="freet"
+          @refresh="fetchDeletedFreets"
         />
       </section>
       <article

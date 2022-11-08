@@ -175,7 +175,7 @@ export default {
     return {
       editing: false, // Whether or not this freet is in edit mode
       alerts: {}, // Displays success/error messages encountered during freet modification
-
+      draft: this.freet.content
     };
   },
   computed: {
@@ -188,9 +188,6 @@ export default {
     userPath(){
       return `/profile/${this.freet.authorId}`
     },
-    draft(){
-      return this.freet.content;
-    }, // Potentially-new content for this freet
     liked() {
       if (this.freet === undefined) return [];
       return this.freet.likers.includes(this.$store.state.userId);
@@ -233,11 +230,6 @@ export default {
             const res = await r.json();
             throw new Error(res.error);
           }
-          if (!this.$store.currentFreetId){
-            this.$store.commit('refreshComments');
-          }
-          this.$store.commit('refreshFreets');
-
         } catch (e) {
           this.$set(this.alerts, e, 'error');
           setTimeout(() => this.$delete(this.alerts, e), 3000);
@@ -253,11 +245,6 @@ export default {
             const res = await r.json();
             throw new Error(res.error);
           }
-          if (!this.$store.currentFreetId){
-            this.$store.commit('refreshComments');
-          }
-          this.$store.commit('refreshFreets');
-
         } catch (e) {
           this.$set(this.alerts, e, 'error');
           setTimeout(() => this.$delete(this.alerts, e), 3000);
@@ -274,11 +261,7 @@ export default {
           const res = await r.json();
           throw new Error(res.error);
         }
-        if (!this.$store.currentFreetId){
-          this.$store.commit('refreshComments');
-        }
-        this.$store.commit('refreshFreets');
-
+        this.$emit('refresh');
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
@@ -295,11 +278,7 @@ export default {
           const res = await r.json();
           throw new Error(res.error);
         }
-        if (!this.$store.currentFreetId){
-          this.$store.commit('refreshComments');
-        }
-        this.$store.commit('refreshFreets');
-        this.$store.commit('refreshDeletedFreets');
+        this.$emit('refresh');
 
       } catch (e) {
         this.$set(this.alerts, e, 'error');
@@ -323,43 +302,8 @@ export default {
           const res = await r.json();
           throw new Error(res.error);
         }
-        if (!this.$store.currentFreetId){
-          this.$store.commit('refreshComments');
-        }
+        this.$emit('refresh');
         this.editing = false;
-        this.$store.commit('refreshFreets');
-        
-
-      } catch (e) {
-        this.$set(this.alerts, e, 'error');
-        setTimeout(() => this.$delete(this.alerts, e), 3000);
-      }
-    },
-    async request(params) {
-      /**
-       * Submits a request to the freet's endpoint
-       * @param params - Options for the request
-       * @param params.body - Body for the request, if it exists
-       * @param params.callback - Function to run if the the request succeeds
-       */
-      const options = {
-        method: params.method, headers: {'Content-Type': 'application/json'}
-      };
-      if (params.body) {
-        options.body = params.body;
-      }
-
-      try {
-        const r = await fetch(`/api/freets/${this.freet._id}`, options);
-        if (!r.ok) {
-          const res = await r.json();
-          throw new Error(res.error);
-        }
-
-        this.editing = false;
-        this.$store.commit('refreshFreets');
-
-        params.callback();
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
@@ -374,10 +318,6 @@ export default {
             const res = await r.json();
             throw new Error(res.error);
           }
-          if (!this.$store.currentFreetId){
-            this.$store.commit('refreshComments');
-          }
-          this.$store.commit('refreshFreets');
           this.addNotification("like");
           this.$emit('refresh');
         } catch (e) {
@@ -391,10 +331,6 @@ export default {
             const res = await r.json();
             throw new Error(res.error);
           }
-          if (!this.$store.currentFreetId){
-            this.$store.commit('refreshComments');
-          }
-          this.$store.commit('refreshFreets');
           this.deleteNotification("like");
           this.$emit('refresh');
         } catch (e) {
@@ -412,10 +348,6 @@ export default {
           const res = await r.json();
           throw new Error(res.error);
         }
-        if (!this.$store.currentFreetId){
-          this.$store.commit('refreshComments');
-        }
-        this.$store.commit('refreshFreets');
         this.addNotification("refreet");
         this.$emit('refresh');
       } catch (e) {
@@ -429,10 +361,6 @@ export default {
           const res = await r.json();
           throw new Error(res.error);
         }
-        if (!this.$store.currentFreetId){
-          this.$store.commit('refreshComments');
-        }
-        this.$store.commit('refreshFreets');
         this.deleteNotification("refreet");
         this.$emit('refresh');
       } catch (e) {
@@ -450,10 +378,6 @@ export default {
           const res = await r.json();
           throw new Error(res.error);
         }
-        if (!this.$store.currentFreetId){
-          this.$store.commit('refreshComments');
-        }
-        this.$store.commit('refreshFreets');
         this.$emit('refresh');
 
       } catch (e) {
@@ -467,10 +391,6 @@ export default {
           const res = await r.json();
           throw new Error(res.error);
         }
-        if (!this.$store.currentFreetId){
-          this.$store.commit('refreshComments');
-        }
-        this.$store.commit('refreshFreets');
         this.$emit('refresh');
 
       } catch (e) {
@@ -487,7 +407,7 @@ export default {
           const res = await r.json();
           throw new Error(res.error);
         }
-        this.$store.commit('refreshFreets');  
+        this.$emit('refresh');
     }
     catch (e) {
         this.$set(this.alerts, e, 'error');

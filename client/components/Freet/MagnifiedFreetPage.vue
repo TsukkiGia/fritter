@@ -42,6 +42,7 @@
           v-for="comment in comments"
           :key="comment.id"
           :freet="comment"
+          @refresh="$store.commit('refreshComments')"
         />
       </section>
     </article>
