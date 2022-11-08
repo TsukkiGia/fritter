@@ -88,7 +88,7 @@ async function allFreetsByOnePerson(userId: string): Promise<FreetResponse[]> {
       timeOfDeletion: (freet.timeOfDeletion === null || freet.timeOfDeletion === undefined) ? '' : formatDate(freet.timeOfDeletion),
       parentFreet: (freet.parentFreet === null || freet.parentFreet === undefined) ? '' : freet.parentFreet.toString(),
       isRefreet: isRefreet(freetItem) ? 'true' : 'false',
-      refreeter: isRefreet(freetItem) ? user.username : '',
+      refreeter: isRefreet(freetItem) ? (await UserCollection.findOneByUserId(freetItem.refreeter)).username : '',
       viewers: freet.viewers,
       commentPropagation: (freet.commentPropagation === null || freet.commentPropagation === undefined) ? '' : freet.commentPropagation.toString(),
       likers: niceLikers,
