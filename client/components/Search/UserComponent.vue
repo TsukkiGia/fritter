@@ -69,9 +69,6 @@
           alerts: {} ,
           userPath: `profile/${this.user._id}`
         };
-      },
-      mounted(){
-        this.fetchFollowing()
       }
     }
     </script>

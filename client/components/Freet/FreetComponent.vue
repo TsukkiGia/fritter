@@ -57,7 +57,7 @@
       <i v-if="freet.edited">(edited)</i>
     </p>
     <section
-      class="actions"
+      class="actions container"
     >
       <span
         v-if="$store.state.username === freet.author"
@@ -95,47 +95,35 @@
       </span>
       <span
         v-if="$store.state.userId !== null"
+        class="container"
       >
-        <button
-          v-if="!liked"
-          @click="likeRequest"
-        > 
-          👍 Like
-        </button>
+        <ActionButton 
+          :positive-message="'👍 Like'"
+          :negative-message="'👍 Remove like'"
+          :positive-callback="likeRequest"
+          :negative-callback="removeLikeRequest"
+          :freet="freet"
+          :field="'likers'"
+        />
 
-        <button
-          v-if="liked"
-          @click="likeRequest"
-        > 
-          👍 Remove like
-        </button>
-        <button
-          v-if="!refreeted"
-          @click="refreetRequest"
-        > 
-          🔄 Refreet
-        </button>
-
-        <button
-          v-if="refreeted"
-          @click="refreetRequest"
-        > 
-          🔄 Remove refreet
-        </button>
+        <ActionButton 
+          :positive-message="'🔄 Refreet'"
+          :negative-message="'🔄 Remove refreet'"
+          :positive-callback="refreetRequest"
+          :negative-callback="removeRefreetRequest"
+          :freet="freet"
+          :field="'refreeters'"
+        />
+        
         <span v-if="$route.name === 'Freet'">
-          <button
-            v-if="!downvoted"
-            @click="downvoteRequest"
-          > 
-            ⬇️ Downvote
-          </button>
-
-          <button
-            v-if="downvoted"
-            @click="downvoteRequest"
-          > 
-            ⬇️ Remove downvote
-          </button>
+          <ActionButton 
+            :positive-message="'⬇️ Downvote'"
+            :negative-message="'⬇️ Remove downvote'"
+            :positive-callback="downvoteRequest"
+            :negative-callback="removeDownvoteRequest"
+            :freet="freet"
+            :field="'downvoters'"
+          />
         </span>
         <span v-if="$route.name === 'Home'">
           <button
@@ -162,9 +150,10 @@
 <script>
 import moment from 'moment';
 import ProfilePicture from '../Profile/ProfilePicture.vue'
+import ActionButton from './ActionButton.vue';
 export default {
   name: 'FreetComponent',
-  components: {ProfilePicture},
+  components: {ProfilePicture, ActionButton},
   props: {
     freet: {
       type: Object,
@@ -310,7 +299,6 @@ export default {
       }
     },
     async likeRequest() {
-      if (!this.liked){
         try {
           const fields = {freetId: this.freet._id};
           const r = await  fetch('/api/likes', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
@@ -324,7 +312,8 @@ export default {
           this.$set(this.alerts, e, 'error');
           setTimeout(() => this.$delete(this.alerts, e), 3000);
         }
-      } else {
+      },
+      async removeLikeRequest() { {
         try {
           const r = await fetch(`/api/likes?freetId=${ this.freet._id}`, {method: 'DELETE'})
           if (!r.ok) {
@@ -340,7 +329,6 @@ export default {
       }
     },
     async refreetRequest() {
-      if (!this.refreeted){
         try {
         const fields = {freetId: this.freet._id};
         const r = await  fetch('/api/refreets', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
@@ -354,23 +342,22 @@ export default {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
-      } else {
-        try {
-        const r = await fetch(`/api/refreets?freetId=${this.freet._id}`, {method: 'DELETE'})
-        if (!r.ok) {
-          const res = await r.json();
-          throw new Error(res.error);
+      },
+       async removeRefreetRequest()  {
+          try {
+          const r = await fetch(`/api/refreets?freetId=${this.freet._id}`, {method: 'DELETE'})
+          if (!r.ok) {
+            const res = await r.json();
+            throw new Error(res.error);
+          }
+          this.deleteNotification("refreet");
+          this.$emit('refresh');
+        } catch (e) {
+          this.$set(this.alerts, e, 'error');
+          setTimeout(() => this.$delete(this.alerts, e), 3000);
         }
-        this.deleteNotification("refreet");
-        this.$emit('refresh');
-      } catch (e) {
-        this.$set(this.alerts, e, 'error');
-        setTimeout(() => this.$delete(this.alerts, e), 3000);
-      }
-      }
     },
     async downvoteRequest() {
-      if (!this.downvoted){
         try {
         const fields = {freetId: this.freet._id};
         const r = await  fetch('/api/downvotes', {method: 'POST', body: JSON.stringify(fields), headers: {'Content-Type': 'application/json'}});
@@ -384,7 +371,8 @@ export default {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
-      } else {
+    },
+      async removeDownvoteRequest(){
         try {
         const r = await fetch(`/api/downvotes?freetId=${ this.freet._id}`, {method: 'DELETE'})
         if (!r.ok) {
@@ -396,7 +384,6 @@ export default {
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
-      }
       }
     },
     async hideFreet(){
@@ -425,6 +412,7 @@ export default {
   align-items: center;
   margin-bottom: 0px;
 }
+
 .toxicity {
   font-size:10pt;
   color: #898b8c;
